@@ -1,17 +1,17 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { DbService } from "../db.service.js";
-import type { Entity } from "../db.service.js";
+import { StorageService } from "../storage.service.js";
+import type { Entity } from "../storage.service.js";
 
 interface TestEntity extends Entity {
   name: string;
   value: number;
 }
 
-describe("DbService", () => {
-  let service: DbService;
+describe("StorageService", () => {
+  let service: StorageService;
 
   beforeEach(() => {
-    service = new DbService();
+    service = new StorageService();
   });
 
   describe("create", () => {

@@ -5,7 +5,7 @@ export interface Entity {
 }
 
 @Injectable()
-export class DbService {
+export class StorageService {
   private readonly collections = new Map<string, Map<string, Entity>>();
 
   private getCollection(name: string): Map<string, Entity> {
