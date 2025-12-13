@@ -33,7 +33,19 @@ pnpm install
 
 ```
 packages/
-  core/       - Core functionality
+  calc/       - Calculator utilities (add, subtract)
+  proto/      - NestJS application prototype
+```
+
+## Running the NestJS App
+
+```bash
+# Development mode with hot reload
+pnpm --filter @simple-proto/proto start:dev
+
+# Production build
+pnpm --filter @simple-proto/proto build
+pnpm --filter @simple-proto/proto start
 ```
 
 ## Tools Required for Health Checks
