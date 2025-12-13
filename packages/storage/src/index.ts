@@ -1,3 +1,10 @@
 export { Storage } from "./storage.js";
-export type { Entity, IStorage } from "./storage.js";
-export { StorageError, EntityNotFoundError, EntityAlreadyExistsError } from "./errors.js";
+export type { Entity, EntityInput, CollectionConfig, ValidateFn, IStorage } from "./storage.js";
+export {
+  StorageError,
+  CollectionNotFoundError,
+  CollectionAlreadyExistsError,
+  ValidationError,
+  EntityNotFoundError,
+  EntityAlreadyExistsError,
+} from "./errors.js";

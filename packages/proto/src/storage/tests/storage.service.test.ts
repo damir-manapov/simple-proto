@@ -10,6 +10,9 @@ describe("StorageService", () => {
 
   it("should have all Storage methods", () => {
     const service = new StorageService();
+    expect(typeof service.registerCollection).toBe("function");
+    expect(typeof service.hasCollection).toBe("function");
+    expect(typeof service.getCollections).toBe("function");
     expect(typeof service.create).toBe("function");
     expect(typeof service.findById).toBe("function");
     expect(typeof service.findAll).toBe("function");
@@ -17,5 +20,13 @@ describe("StorageService", () => {
     expect(typeof service.delete).toBe("function");
     expect(typeof service.clear).toBe("function");
     expect(typeof service.clearAll).toBe("function");
+  });
+
+  it("should require collection registration before use", () => {
+    const service = new StorageService();
+    service.registerCollection({ name: "test" });
+    expect(service.hasCollection("test")).toBe(true);
+    const entity = service.create("test", { id: "1" });
+    expect(entity.id).toBe("1");
   });
 });

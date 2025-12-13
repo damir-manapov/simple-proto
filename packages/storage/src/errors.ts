@@ -5,6 +5,30 @@ export class StorageError extends Error {
   }
 }
 
+export class CollectionNotFoundError extends StorageError {
+  constructor(public readonly collection: string) {
+    super(`Collection ${collection} is not registered`);
+    this.name = "CollectionNotFoundError";
+  }
+}
+
+export class CollectionAlreadyExistsError extends StorageError {
+  constructor(public readonly collection: string) {
+    super(`Collection ${collection} is already registered`);
+    this.name = "CollectionAlreadyExistsError";
+  }
+}
+
+export class ValidationError extends StorageError {
+  constructor(
+    public readonly collection: string,
+    public readonly reason: string
+  ) {
+    super(`Validation failed for collection ${collection}: ${reason}`);
+    this.name = "ValidationError";
+  }
+}
+
 export class EntityNotFoundError extends StorageError {
   constructor(
     public readonly collection: string,

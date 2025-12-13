@@ -1,5 +1,11 @@
 import { randomUUID } from "node:crypto";
-import { EntityAlreadyExistsError, EntityNotFoundError } from "./errors.js";
+import {
+  CollectionAlreadyExistsError,
+  CollectionNotFoundError,
+  EntityAlreadyExistsError,
+  EntityNotFoundError,
+  ValidationError,
+} from "./errors.js";
 
 export interface Entity {
   id: string;
@@ -9,7 +15,17 @@ export interface EntityInput {
   id?: string;
 }
 
+export type ValidateFn<T extends EntityInput = EntityInput> = (data: T) => true | string;
+
+export interface CollectionConfig<T extends EntityInput = EntityInput> {
+  name: string;
+  validate?: ValidateFn<T>;
+}
+
 export interface IStorage {
+  registerCollection<T extends EntityInput>(config: CollectionConfig<T>): void;
+  hasCollection(name: string): boolean;
+  getCollections(): string[];
   create<T extends EntityInput>(collection: string, data: T): T & Entity;
   findById(collection: string, id: string): Entity | null;
   findByIdOrThrow(collection: string, id: string): Entity;
@@ -21,30 +37,64 @@ export interface IStorage {
   clearAll(): void;
 }
 
-export class Storage implements IStorage {
-  private readonly collections = new Map<string, Map<string, Entity>>();
+interface CollectionData {
+  config: CollectionConfig;
+  entities: Map<string, Entity>;
+}
 
-  private getCollection(name: string): Map<string, Entity> {
-    if (!this.collections.has(name)) {
-      this.collections.set(name, new Map());
+export class Storage implements IStorage {
+  private readonly collections = new Map<string, CollectionData>();
+
+  registerCollection<T extends EntityInput>(config: CollectionConfig<T>): void {
+    if (this.collections.has(config.name)) {
+      throw new CollectionAlreadyExistsError(config.name);
     }
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return this.collections.get(name)!;
+    this.collections.set(config.name, {
+      config: config as CollectionConfig,
+      entities: new Map(),
+    });
+  }
+
+  hasCollection(name: string): boolean {
+    return this.collections.has(name);
+  }
+
+  getCollections(): string[] {
+    return Array.from(this.collections.keys());
+  }
+
+  private getCollectionData(name: string): CollectionData {
+    const data = this.collections.get(name);
+    if (!data) {
+      throw new CollectionNotFoundError(name);
+    }
+    return data;
+  }
+
+  private validate(collection: string, data: EntityInput, config: CollectionConfig): void {
+    if (config.validate) {
+      const result = config.validate(data);
+      if (result !== true) {
+        throw new ValidationError(collection, result);
+      }
+    }
   }
 
   create<T extends EntityInput>(collection: string, data: T): T & Entity {
+    const { config, entities } = this.getCollectionData(collection);
+    this.validate(collection, data, config);
     const id = data.id ?? randomUUID();
     const entity = { ...data, id } as T & Entity;
-    const col = this.getCollection(collection);
-    if (col.has(id)) {
+    if (entities.has(id)) {
       throw new EntityAlreadyExistsError(collection, id);
     }
-    col.set(id, entity);
+    entities.set(id, entity);
     return entity;
   }
 
   findById(collection: string, id: string): Entity | null {
-    return this.getCollection(collection).get(id) ?? null;
+    const { entities } = this.getCollectionData(collection);
+    return entities.get(id) ?? null;
   }
 
   findByIdOrThrow(collection: string, id: string): Entity {
@@ -56,16 +106,18 @@ export class Storage implements IStorage {
   }
 
   findAll(collection: string): Entity[] {
-    return Array.from(this.getCollection(collection).values());
+    const { entities } = this.getCollectionData(collection);
+    return Array.from(entities.values());
   }
 
   update<T extends Entity>(collection: string, id: string, data: T): T | null {
-    const col = this.getCollection(collection);
-    const existing = col.get(id);
+    const { config, entities } = this.getCollectionData(collection);
+    this.validate(collection, data, config);
+    const existing = entities.get(id);
     if (!existing) {
       return null;
     }
-    col.set(id, data);
+    entities.set(id, data);
     return data;
   }
 
@@ -78,14 +130,18 @@ export class Storage implements IStorage {
   }
 
   delete(collection: string, id: string): boolean {
-    return this.getCollection(collection).delete(id);
+    const { entities } = this.getCollectionData(collection);
+    return entities.delete(id);
   }
 
   clear(collection: string): void {
-    this.getCollection(collection).clear();
+    const { entities } = this.getCollectionData(collection);
+    entities.clear();
   }
 
   clearAll(): void {
-    this.collections.clear();
+    for (const data of this.collections.values()) {
+      data.entities.clear();
+    }
   }
 }

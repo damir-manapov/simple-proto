@@ -1,6 +1,6 @@
 # @simple-proto/storage
 
-In-memory storage with collection-based entity management.
+In-memory storage with collection-based entity management and validation.
 
 ## Installation
 
@@ -11,7 +11,7 @@ pnpm add @simple-proto/storage
 ## Usage
 
 ```typescript
-import { Storage, Entity, EntityInput } from "@simple-proto/storage";
+import { Storage, Entity, EntityInput, CollectionConfig } from "@simple-proto/storage";
 
 interface User extends Entity {
   name: string;
@@ -24,6 +24,18 @@ interface UserInput extends EntityInput {
 }
 
 const storage = new Storage();
+
+// Register collections before use (strict mode)
+storage.registerCollection({ name: "users" });
+
+// Register with validation
+storage.registerCollection<UserInput>({
+  name: "posts",
+  validate: (data) => {
+    if (!data.name) return "Name is required";
+    return true;
+  },
+});
 
 // Create with auto-generated ID
 const user = storage.create<UserInput>("users", {
@@ -53,7 +65,11 @@ const deleted = storage.delete("users", user.id); // boolean
 
 // Clear
 storage.clear("users"); // Clear single collection
-storage.clearAll(); // Clear all collections
+storage.clearAll(); // Clear all collections (keeps registrations)
+
+// Introspection
+storage.hasCollection("users"); // true
+storage.getCollections(); // ["users", "posts"]
 ```
 
 ## API
@@ -78,12 +94,26 @@ interface EntityInput {
 }
 ```
 
+### CollectionConfig
+
+Configuration for collection registration:
+
+```typescript
+interface CollectionConfig<T extends EntityInput = EntityInput> {
+  name: string;
+  validate?: (data: T) => true | string; // true = valid, string = error message
+}
+```
+
 ### IStorage
 
 Interface for storage implementations:
 
 | Method                                   | Returns          | Description                                      |
 | ---------------------------------------- | ---------------- | ------------------------------------------------ |
+| `registerCollection(config)`             | `void`           | Register a collection (required before use)      |
+| `hasCollection(name)`                    | `boolean`        | Check if collection is registered                |
+| `getCollections()`                       | `string[]`       | Get all registered collection names              |
 | `create<T>(collection, data)`            | `T & Entity`     | Create entity, auto-generates id if not provided |
 | `findById(collection, id)`               | `Entity \| null` | Find by id, returns null if not found            |
 | `findByIdOrThrow(collection, id)`        | `Entity`         | Find by id, throws if not found                  |
@@ -92,19 +122,51 @@ Interface for storage implementations:
 | `updateOrThrow<T>(collection, id, data)` | `T`              | Update entity, throws if not found               |
 | `delete(collection, id)`                 | `boolean`        | Delete entity, returns success status            |
 | `clear(collection)`                      | `void`           | Clear single collection                          |
-| `clearAll()`                             | `void`           | Clear all collections                            |
+| `clearAll()`                             | `void`           | Clear all collections (keeps registrations)      |
 
 ## Errors
 
 Custom error classes for handling storage operations:
 
 ```typescript
-import { StorageError, EntityNotFoundError, EntityAlreadyExistsError } from "@simple-proto/storage";
+import {
+  StorageError,
+  CollectionNotFoundError,
+  CollectionAlreadyExistsError,
+  ValidationError,
+  EntityNotFoundError,
+  EntityAlreadyExistsError,
+} from "@simple-proto/storage";
 ```
 
 ### StorageError
 
 Base error class for all storage errors.
+
+### CollectionNotFoundError
+
+Thrown when accessing an unregistered collection.
+
+Properties:
+
+- `collection: string` - Collection name
+
+### CollectionAlreadyExistsError
+
+Thrown when registering a collection that already exists.
+
+Properties:
+
+- `collection: string` - Collection name
+
+### ValidationError
+
+Thrown when validation fails on create or update.
+
+Properties:
+
+- `collection: string` - Collection name
+- `reason: string` - Validation error message
 
 ### EntityNotFoundError
 
