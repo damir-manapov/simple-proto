@@ -3,8 +3,8 @@ import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { Test } from "@nestjs/testing";
 import type { TestingModule } from "@nestjs/testing";
 import { BadRequestException } from "@nestjs/common";
-import { CalcController } from "../../src/calc/calc.controller.js";
-import { CalcService } from "../../src/calc/calc.service.js";
+import { CalcController } from "./calc.controller.js";
+import { CalcService } from "./calc.service.js";
 
 describe("CalcController", () => {
   let module: TestingModule;

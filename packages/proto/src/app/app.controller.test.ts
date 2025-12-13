@@ -2,8 +2,8 @@ import "reflect-metadata";
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { Test } from "@nestjs/testing";
 import type { TestingModule } from "@nestjs/testing";
-import { AppController } from "../../src/app/app.controller.js";
-import { AppService } from "../../src/app/app.service.js";
+import { AppController } from "./app.controller.js";
+import { AppService } from "./app.service.js";
 
 describe("AppController", () => {
   let module: TestingModule;
