@@ -15,17 +15,23 @@ export interface CollectionConfig {
   schema?: Schema;
 }
 
+export interface IRepository<T extends Entry = Entry, TInput extends EntryInput = EntryInput> {
+  create(data: TInput): T;
+  findById(id: string): T | null;
+  findByIdOrThrow(id: string): T;
+  findAll(): T[];
+  update(id: string, data: T): T | null;
+  updateOrThrow(id: string, data: T): T;
+  delete(id: string): boolean;
+  clear(): void;
+}
+
 export interface IStorage {
   registerCollection(config: CollectionConfig): void;
   hasCollection(name: string): boolean;
   getCollections(): string[];
-  create<T extends EntryInput>(collection: string, data: T): T & Entry;
-  findById(collection: string, id: string): Entry | null;
-  findByIdOrThrow(collection: string, id: string): Entry;
-  findAll(collection: string): Entry[];
-  update<T extends Entry>(collection: string, id: string, data: T): T | null;
-  updateOrThrow<T extends Entry>(collection: string, id: string, data: T): T;
-  delete(collection: string, id: string): boolean;
-  clear(collection: string): void;
+  getRepository<T extends Entry = Entry, TInput extends EntryInput = EntryInput>(
+    collection: string
+  ): IRepository<T, TInput>;
   clearAll(): void;
 }

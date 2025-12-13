@@ -8,7 +8,7 @@ import {
   EntryNotFoundError,
   ValidationError,
 } from "./errors.js";
-import type { CollectionConfig, Entry, EntryInput, IStorage } from "./types.js";
+import type { CollectionConfig, Entry, EntryInput, IRepository, IStorage } from "./types.js";
 
 // Handle CommonJS/ESM interop
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -18,6 +18,48 @@ interface CollectionData {
   config: CollectionConfig;
   entities: Map<string, Entry>;
   validator?: ValidateFunction;
+}
+
+class Repository<
+  T extends Entry = Entry,
+  TInput extends EntryInput = EntryInput,
+> implements IRepository<T, TInput> {
+  constructor(
+    private readonly collectionName: string,
+    private readonly storage: Storage
+  ) {}
+
+  create(data: TInput): T {
+    return this.storage.create<TInput>(this.collectionName, data) as unknown as T;
+  }
+
+  findById(id: string): T | null {
+    return this.storage.findById(this.collectionName, id) as T | null;
+  }
+
+  findByIdOrThrow(id: string): T {
+    return this.storage.findByIdOrThrow(this.collectionName, id) as T;
+  }
+
+  findAll(): T[] {
+    return this.storage.findAll(this.collectionName) as T[];
+  }
+
+  update(id: string, data: T): T | null {
+    return this.storage.update<T>(this.collectionName, id, data);
+  }
+
+  updateOrThrow(id: string, data: T): T {
+    return this.storage.updateOrThrow<T>(this.collectionName, id, data);
+  }
+
+  delete(id: string): boolean {
+    return this.storage.delete(this.collectionName, id);
+  }
+
+  clear(): void {
+    this.storage.clear(this.collectionName);
+  }
 }
 
 export class Storage implements IStorage {
@@ -44,6 +86,14 @@ export class Storage implements IStorage {
 
   getCollections(): string[] {
     return Array.from(this.collections.keys());
+  }
+
+  getRepository<T extends Entry = Entry, TInput extends EntryInput = EntryInput>(
+    collection: string
+  ): IRepository<T, TInput> {
+    // Verify collection exists
+    this.getCollectionData(collection);
+    return new Repository<T, TInput>(collection, this);
   }
 
   private getCollectionData(name: string): CollectionData {
