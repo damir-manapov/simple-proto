@@ -1,5 +1,9 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { Storage, CollectionAlreadyExistsError, CollectionNotFoundError } from "../src/index.js";
+import {
+  Storage,
+  EntityCollectionAlreadyExistsError,
+  EntityCollectionNotFoundError,
+} from "../src/index.js";
 import type { EntryInput, JSONSchemaType } from "../src/index.js";
 
 interface TestEntityInput extends EntryInput {
@@ -31,11 +35,11 @@ describe("Storage - Collection Management", () => {
       expect(storage.hasCollection("test")).toBe(true);
     });
 
-    it("should throw CollectionAlreadyExistsError for duplicate registration", () => {
+    it("should throw EntityCollectionAlreadyExistsError for duplicate registration", () => {
       storage.registerCollection({ name: "test" });
       expect(() => {
         storage.registerCollection({ name: "test" });
-      }).toThrow(CollectionAlreadyExistsError);
+      }).toThrow(EntityCollectionAlreadyExistsError);
       expect(() => {
         storage.registerCollection({ name: "test" });
       }).toThrow("Collection test is already registered");
@@ -74,20 +78,20 @@ describe("Storage - Collection Management", () => {
   });
 
   describe("unregistered collection errors", () => {
-    it("should throw CollectionNotFoundError for create on unregistered collection", () => {
+    it("should throw EntityCollectionNotFoundError for create on unregistered collection", () => {
       expect(() => storage.create("unknown", { id: "1", name: "test", value: 42 })).toThrow(
-        CollectionNotFoundError
+        EntityCollectionNotFoundError
       );
     });
 
-    it("should throw CollectionNotFoundError for findById on unregistered collection", () => {
-      expect(() => storage.findById("unknown", "1")).toThrow(CollectionNotFoundError);
+    it("should throw EntityCollectionNotFoundError for findById on unregistered collection", () => {
+      expect(() => storage.findById("unknown", "1")).toThrow(EntityCollectionNotFoundError);
     });
 
-    it("should throw CollectionNotFoundError for clear on unregistered collection", () => {
+    it("should throw EntityCollectionNotFoundError for clear on unregistered collection", () => {
       expect(() => {
         storage.clear("unknown");
-      }).toThrow(CollectionNotFoundError);
+      }).toThrow(EntityCollectionNotFoundError);
     });
   });
 });

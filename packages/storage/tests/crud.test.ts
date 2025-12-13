@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { Storage, EntityAlreadyExistsError, EntityNotFoundError } from "../src/index.js";
+import { Storage, EntryAlreadyExistsError, EntryNotFoundError } from "../src/index.js";
 import type { Entry, EntryInput } from "../src/index.js";
 
 interface TestEntity extends Entry {
@@ -45,10 +45,10 @@ describe("Storage - CRUD Operations", () => {
       expect(result1.id).not.toBe(result2.id);
     });
 
-    it("should throw EntityAlreadyExistsError when creating duplicate id", () => {
+    it("should throw EntryAlreadyExistsError when creating duplicate id", () => {
       const entity: TestEntity = { id: "1", name: "test", value: 42 };
       storage.create("test", entity);
-      expect(() => storage.create("test", entity)).toThrow(EntityAlreadyExistsError);
+      expect(() => storage.create("test", entity)).toThrow(EntryAlreadyExistsError);
       expect(() => storage.create("test", entity)).toThrow(
         "Entry with id 1 already exists in collection test"
       );
@@ -77,8 +77,8 @@ describe("Storage - CRUD Operations", () => {
       expect(result).toEqual(entity);
     });
 
-    it("should throw EntityNotFoundError for non-existent id", () => {
-      expect(() => storage.findByIdOrThrow("test", "999")).toThrow(EntityNotFoundError);
+    it("should throw EntryNotFoundError for non-existent id", () => {
+      expect(() => storage.findByIdOrThrow("test", "999")).toThrow(EntryNotFoundError);
       expect(() => storage.findByIdOrThrow("test", "999")).toThrow(
         "Entry with id 999 not found in collection test"
       );
@@ -128,9 +128,9 @@ describe("Storage - CRUD Operations", () => {
       expect(result).toEqual(updated);
     });
 
-    it("should throw EntityNotFoundError for non-existent id", () => {
+    it("should throw EntryNotFoundError for non-existent id", () => {
       const updated: TestEntity = { id: "999", name: "updated", value: 42 };
-      expect(() => storage.updateOrThrow("test", "999", updated)).toThrow(EntityNotFoundError);
+      expect(() => storage.updateOrThrow("test", "999", updated)).toThrow(EntryNotFoundError);
       expect(() => storage.updateOrThrow("test", "999", updated)).toThrow(
         "Entry with id 999 not found in collection test"
       );

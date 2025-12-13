@@ -3,9 +3,9 @@ export type { Entry, EntryInput, CollectionConfig, Schema, IStorage } from "./ty
 export type { JSONSchemaType } from "ajv";
 export {
   StorageError,
-  CollectionNotFoundError,
-  CollectionAlreadyExistsError,
+  EntityCollectionNotFoundError,
+  EntityCollectionAlreadyExistsError,
   ValidationError,
-  EntityNotFoundError,
-  EntityAlreadyExistsError,
+  EntryNotFoundError,
+  EntryAlreadyExistsError,
 } from "./errors.js";

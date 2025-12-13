@@ -5,17 +5,17 @@ export class StorageError extends Error {
   }
 }
 
-export class CollectionNotFoundError extends StorageError {
+export class EntityCollectionNotFoundError extends StorageError {
   constructor(public readonly collection: string) {
     super(`Collection ${collection} is not registered`);
-    this.name = "CollectionNotFoundError";
+    this.name = "EntityCollectionNotFoundError";
   }
 }
 
-export class CollectionAlreadyExistsError extends StorageError {
+export class EntityCollectionAlreadyExistsError extends StorageError {
   constructor(public readonly collection: string) {
     super(`Collection ${collection} is already registered`);
-    this.name = "CollectionAlreadyExistsError";
+    this.name = "EntityCollectionAlreadyExistsError";
   }
 }
 
@@ -29,22 +29,22 @@ export class ValidationError extends StorageError {
   }
 }
 
-export class EntityNotFoundError extends StorageError {
+export class EntryNotFoundError extends StorageError {
   constructor(
     public readonly collection: string,
     public readonly id: string
   ) {
     super(`Entry with id ${id} not found in collection ${collection}`);
-    this.name = "EntityNotFoundError";
+    this.name = "EntryNotFoundError";
   }
 }
 
-export class EntityAlreadyExistsError extends StorageError {
+export class EntryAlreadyExistsError extends StorageError {
   constructor(
     public readonly collection: string,
     public readonly id: string
   ) {
     super(`Entry with id ${id} already exists in collection ${collection}`);
-    this.name = "EntityAlreadyExistsError";
+    this.name = "EntryAlreadyExistsError";
   }
 }

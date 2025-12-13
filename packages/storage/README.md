@@ -145,11 +145,11 @@ Custom error classes for handling storage operations:
 ```typescript
 import {
   StorageError,
-  CollectionNotFoundError,
-  CollectionAlreadyExistsError,
+  EntityCollectionNotFoundError,
+  EntityCollectionAlreadyExistsError,
   ValidationError,
-  EntityNotFoundError,
-  EntityAlreadyExistsError,
+  EntryNotFoundError,
+  EntryAlreadyExistsError,
 } from "@simple-proto/storage";
 ```
 
@@ -157,7 +157,7 @@ import {
 
 Base error class for all storage errors.
 
-### CollectionNotFoundError
+### EntityCollectionNotFoundError
 
 Thrown when accessing an unregistered collection.
 
@@ -165,7 +165,7 @@ Properties:
 
 - `collection: string` - Collection name
 
-### CollectionAlreadyExistsError
+### EntityCollectionAlreadyExistsError
 
 Thrown when registering a collection that already exists.
 
@@ -182,7 +182,7 @@ Properties:
 - `collection: string` - Collection name
 - `reason: string` - Validation error message
 
-### EntityNotFoundError
+### EntryNotFoundError
 
 Thrown when an entity is not found (by `findByIdOrThrow`, `updateOrThrow`).
 
@@ -191,7 +191,7 @@ Properties:
 - `collection: string` - Collection name
 - `id: string` - Entry id
 
-### EntityAlreadyExistsError
+### EntryAlreadyExistsError
 
 Thrown when creating an entity with a duplicate id.
 

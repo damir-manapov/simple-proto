@@ -2,10 +2,10 @@ import { randomUUID } from "node:crypto";
 import AjvModule from "ajv";
 import type { ValidateFunction } from "ajv";
 import {
-  CollectionAlreadyExistsError,
-  CollectionNotFoundError,
-  EntityAlreadyExistsError,
-  EntityNotFoundError,
+  EntityCollectionAlreadyExistsError,
+  EntityCollectionNotFoundError,
+  EntryAlreadyExistsError,
+  EntryNotFoundError,
   ValidationError,
 } from "./errors.js";
 import type { CollectionConfig, Entry, EntryInput, IStorage } from "./types.js";
@@ -26,7 +26,7 @@ export class Storage implements IStorage {
 
   registerCollection(config: CollectionConfig): void {
     if (this.collections.has(config.name)) {
-      throw new CollectionAlreadyExistsError(config.name);
+      throw new EntityCollectionAlreadyExistsError(config.name);
     }
     const collectionData: CollectionData = {
       config,
@@ -49,7 +49,7 @@ export class Storage implements IStorage {
   private getCollectionData(name: string): CollectionData {
     const data = this.collections.get(name);
     if (!data) {
-      throw new CollectionNotFoundError(name);
+      throw new EntityCollectionNotFoundError(name);
     }
     return data;
   }
@@ -71,7 +71,7 @@ export class Storage implements IStorage {
     const id = data.id ?? randomUUID();
     const entity = { ...data, id } as T & Entry;
     if (collectionData.entities.has(id)) {
-      throw new EntityAlreadyExistsError(collection, id);
+      throw new EntryAlreadyExistsError(collection, id);
     }
     collectionData.entities.set(id, entity);
     return entity;
@@ -85,7 +85,7 @@ export class Storage implements IStorage {
   findByIdOrThrow(collection: string, id: string): Entry {
     const entity = this.findById(collection, id);
     if (entity === null) {
-      throw new EntityNotFoundError(collection, id);
+      throw new EntryNotFoundError(collection, id);
     }
     return entity;
   }
@@ -109,7 +109,7 @@ export class Storage implements IStorage {
   updateOrThrow<T extends Entry>(collection: string, id: string, data: T): T {
     const result = this.update(collection, id, data);
     if (result === null) {
-      throw new EntityNotFoundError(collection, id);
+      throw new EntryNotFoundError(collection, id);
     }
     return result;
   }
