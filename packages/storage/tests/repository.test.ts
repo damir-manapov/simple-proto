@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { Storage, EntryNotFoundError, EntryAlreadyExistsError } from "../src/index.js";
-import type { Entry, EntryInput, IRepository } from "../src/index.js";
+import type { Entry, EntryInput, IRepository, JSONSchemaType } from "../src/index.js";
 
 interface User extends Entry {
   name: string;
@@ -12,13 +12,24 @@ interface UserInput extends EntryInput {
   email: string;
 }
 
+const userSchema: JSONSchemaType<UserInput> = {
+  type: "object",
+  properties: {
+    id: { type: "string", nullable: true },
+    name: { type: "string" },
+    email: { type: "string" },
+  },
+  required: ["name", "email"],
+  additionalProperties: false,
+};
+
 describe("Repository", () => {
   let storage: Storage;
   let userRepo: IRepository<User, UserInput>;
 
   beforeEach(() => {
     storage = new Storage();
-    storage.registerCollection({ name: "users" });
+    storage.registerCollection({ name: "users", schema: userSchema });
     userRepo = storage.getRepository<User, UserInput>("users");
   });
 

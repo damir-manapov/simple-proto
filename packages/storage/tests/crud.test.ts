@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { Storage, EntryAlreadyExistsError, EntryNotFoundError } from "../src/index.js";
-import type { Entry, EntryInput } from "../src/index.js";
+import type { Entry, EntryInput, JSONSchemaType } from "../src/index.js";
 
 interface TestEntity extends Entry {
   name: string;
@@ -12,12 +12,23 @@ interface TestEntityInput extends EntryInput {
   value: number;
 }
 
+const testEntitySchema: JSONSchemaType<TestEntityInput> = {
+  type: "object",
+  properties: {
+    id: { type: "string", nullable: true },
+    name: { type: "string" },
+    value: { type: "number" },
+  },
+  required: ["name", "value"],
+  additionalProperties: false,
+};
+
 describe("Storage - CRUD Operations", () => {
   let storage: Storage;
 
   beforeEach(() => {
     storage = new Storage();
-    storage.registerCollection({ name: "test" });
+    storage.registerCollection({ name: "test", schema: testEntitySchema });
   });
 
   describe("create", () => {

@@ -137,6 +137,49 @@ Interface for storage implementations:
 | `delete(collection, id)`                 | `boolean`       | Delete entity, returns success status            |
 | `clear(collection)`                      | `void`          | Clear single collection                          |
 | `clearAll()`                             | `void`          | Clear all collections (keeps registrations)      |
+| `getRepository<T, TInput>(collection)`   | `IRepository`   | Get typed repository for a collection            |
+
+### IRepository
+
+Interface for typed repository operations on a specific collection:
+
+| Method                    | Returns     | Description                                |
+| ------------------------- | ----------- | ------------------------------------------ |
+| `create(data)`            | `T`         | Create entry, auto-generates id if missing |
+| `findById(id)`            | `T \| null` | Find by id, returns null if not found      |
+| `findByIdOrThrow(id)`     | `T`         | Find by id, throws if not found            |
+| `findAll()`               | `T[]`       | Get all entries in collection              |
+| `update(id, data)`        | `T \| null` | Update entry, returns null if not found    |
+| `updateOrThrow(id, data)` | `T`         | Update entry, throws if not found          |
+| `delete(id)`              | `boolean`   | Delete entry, returns success status       |
+| `clear()`                 | `void`      | Clear all entries in collection            |
+
+#### Repository Usage
+
+```typescript
+interface User extends Entry {
+  name: string;
+  email: string;
+}
+
+interface UserInput extends EntryInput {
+  name: string;
+  email: string;
+}
+
+const storage = new Storage();
+storage.registerCollection({ name: "users" });
+
+// Get typed repository
+const userRepo = storage.getRepository<User, UserInput>("users");
+
+// All operations are now typed
+const user = userRepo.create({ name: "John", email: "john@example.com" });
+const found = userRepo.findById(user.id); // User | null
+const all = userRepo.findAll(); // User[]
+userRepo.update(user.id, { ...user, name: "Johnny" });
+userRepo.delete(user.id);
+```
 
 ## Errors
 

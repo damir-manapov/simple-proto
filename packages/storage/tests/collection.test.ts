@@ -4,7 +4,7 @@ import {
   EntityCollectionAlreadyExistsError,
   EntityCollectionNotFoundError,
 } from "../src/index.js";
-import type { EntryInput, JSONSchemaType } from "../src/index.js";
+import type { EntryInput, JSONSchemaType, Schema } from "../src/index.js";
 
 interface TestEntityInput extends EntryInput {
   name: string;
@@ -22,6 +22,8 @@ const testEntitySchema: JSONSchemaType<TestEntityInput> = {
   additionalProperties: false,
 };
 
+const anySchema: Schema = { type: "object", additionalProperties: true };
+
 describe("Storage - Collection Management", () => {
   let storage: Storage;
 
@@ -31,17 +33,17 @@ describe("Storage - Collection Management", () => {
 
   describe("registerCollection", () => {
     it("should register a collection", () => {
-      storage.registerCollection({ name: "test" });
+      storage.registerCollection({ name: "test", schema: anySchema });
       expect(storage.hasCollection("test")).toBe(true);
     });
 
     it("should throw EntityCollectionAlreadyExistsError for duplicate registration", () => {
-      storage.registerCollection({ name: "test" });
+      storage.registerCollection({ name: "test", schema: anySchema });
       expect(() => {
-        storage.registerCollection({ name: "test" });
+        storage.registerCollection({ name: "test", schema: anySchema });
       }).toThrow(EntityCollectionAlreadyExistsError);
       expect(() => {
-        storage.registerCollection({ name: "test" });
+        storage.registerCollection({ name: "test", schema: anySchema });
       }).toThrow("Collection test is already registered");
     });
 
@@ -60,7 +62,7 @@ describe("Storage - Collection Management", () => {
     });
 
     it("should return true for registered collection", () => {
-      storage.registerCollection({ name: "test" });
+      storage.registerCollection({ name: "test", schema: anySchema });
       expect(storage.hasCollection("test")).toBe(true);
     });
   });
@@ -71,9 +73,20 @@ describe("Storage - Collection Management", () => {
     });
 
     it("should return all registered collection names", () => {
-      storage.registerCollection({ name: "users" });
-      storage.registerCollection({ name: "posts" });
+      storage.registerCollection({ name: "users", schema: anySchema });
+      storage.registerCollection({ name: "posts", schema: anySchema });
       expect(storage.getCollections()).toEqual(["users", "posts"]);
+    });
+  });
+
+  describe("getCollectionSchema", () => {
+    it("should return schema for collection", () => {
+      storage.registerCollection({ name: "test", schema: testEntitySchema });
+      expect(storage.getCollectionSchema("test")).toEqual(testEntitySchema);
+    });
+
+    it("should throw EntityCollectionNotFoundError for unregistered collection", () => {
+      expect(() => storage.getCollectionSchema("unknown")).toThrow(EntityCollectionNotFoundError);
     });
   });
 

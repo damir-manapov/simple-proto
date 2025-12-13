@@ -1,6 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { StorageService } from "../storage.service.js";
 import { Storage } from "@simple-proto/storage";
+import type { Schema } from "@simple-proto/storage";
+
+const anySchema: Schema = { type: "object", additionalProperties: true };
 
 describe("StorageService", () => {
   it("should be an instance of Storage", () => {
@@ -24,7 +27,7 @@ describe("StorageService", () => {
 
   it("should require collection registration before use", () => {
     const service = new StorageService();
-    service.registerCollection({ name: "test" });
+    service.registerCollection({ name: "test", schema: anySchema });
     expect(service.hasCollection("test")).toBe(true);
     const entity = service.create("test", { id: "1" });
     expect(entity.id).toBe("1");

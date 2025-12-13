@@ -8,7 +8,14 @@ import {
   EntryNotFoundError,
   ValidationError,
 } from "./errors.js";
-import type { CollectionConfig, Entry, EntryInput, IRepository, IStorage } from "./types.js";
+import type {
+  CollectionConfig,
+  Entry,
+  EntryInput,
+  IRepository,
+  IStorage,
+  Schema,
+} from "./types.js";
 
 // Handle CommonJS/ESM interop
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -17,7 +24,7 @@ const Ajv = AjvModule.default ?? AjvModule;
 interface CollectionData {
   config: CollectionConfig;
   entities: Map<string, Entry>;
-  validator?: ValidateFunction;
+  validator: ValidateFunction;
 }
 
 class Repository<
@@ -73,10 +80,8 @@ export class Storage implements IStorage {
     const collectionData: CollectionData = {
       config,
       entities: new Map(),
+      validator: this.ajv.compile(config.schema),
     };
-    if (config.schema) {
-      collectionData.validator = this.ajv.compile(config.schema);
-    }
     this.collections.set(config.name, collectionData);
   }
 
@@ -86,6 +91,11 @@ export class Storage implements IStorage {
 
   getCollections(): string[] {
     return Array.from(this.collections.keys());
+  }
+
+  getCollectionSchema(name: string): Schema {
+    const data = this.getCollectionData(name);
+    return data.config.schema;
   }
 
   getRepository<T extends Entry = Entry, TInput extends EntryInput = EntryInput>(
@@ -106,12 +116,10 @@ export class Storage implements IStorage {
 
   private validate(collection: string, data: EntryInput, collectionData: CollectionData): void {
     const { validator } = collectionData;
-    if (validator) {
-      const valid = validator(data);
-      if (!valid) {
-        const message = this.ajv.errorsText(validator.errors);
-        throw new ValidationError(collection, message);
-      }
+    const valid = validator(data);
+    if (!valid) {
+      const message = this.ajv.errorsText(validator.errors);
+      throw new ValidationError(collection, message);
     }
   }
 

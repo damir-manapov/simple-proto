@@ -62,11 +62,4 @@ describe("Storage - Validation", () => {
     const result = storage.create<TestEntityInput>("validated", input);
     expect(result.value).toBe(42);
   });
-
-  it("should skip validation when not configured", () => {
-    storage.registerCollection({ name: "novalidation" });
-    const input: TestEntityInput = { name: "test", value: -1 };
-    const result = storage.create("novalidation", input);
-    expect(result.id).toBeDefined();
-  });
 });

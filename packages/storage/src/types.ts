@@ -12,7 +12,7 @@ export interface EntryInput {
 
 export interface CollectionConfig {
   name: string;
-  schema?: Schema;
+  schema: Schema;
 }
 
 export interface IRepository<T extends Entry = Entry, TInput extends EntryInput = EntryInput> {
@@ -30,6 +30,7 @@ export interface IStorage {
   registerCollection(config: CollectionConfig): void;
   hasCollection(name: string): boolean;
   getCollections(): string[];
+  getCollectionSchema(name: string): Schema;
   getRepository<T extends Entry = Entry, TInput extends EntryInput = EntryInput>(
     collection: string
   ): IRepository<T, TInput>;

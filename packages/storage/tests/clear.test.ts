@@ -1,5 +1,8 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { Storage } from "../src/index.js";
+import type { Schema } from "../src/index.js";
+
+const anySchema: Schema = { type: "object", additionalProperties: true };
 
 describe("Storage - Clear Operations", () => {
   let storage: Storage;
@@ -10,7 +13,7 @@ describe("Storage - Clear Operations", () => {
 
   describe("clear", () => {
     it("should clear a collection", () => {
-      storage.registerCollection({ name: "test" });
+      storage.registerCollection({ name: "test", schema: anySchema });
       storage.create("test", { id: "1", name: "test", value: 1 });
       storage.create("test", { id: "2", name: "test2", value: 2 });
       storage.clear("test");
@@ -18,8 +21,8 @@ describe("Storage - Clear Operations", () => {
     });
 
     it("should not affect other collections", () => {
-      storage.registerCollection({ name: "test1" });
-      storage.registerCollection({ name: "test2" });
+      storage.registerCollection({ name: "test1", schema: anySchema });
+      storage.registerCollection({ name: "test2", schema: anySchema });
       storage.create("test1", { id: "1" });
       storage.create("test2", { id: "1" });
       storage.clear("test1");
@@ -30,8 +33,8 @@ describe("Storage - Clear Operations", () => {
 
   describe("clearAll", () => {
     it("should clear all collections", () => {
-      storage.registerCollection({ name: "test1" });
-      storage.registerCollection({ name: "test2" });
+      storage.registerCollection({ name: "test1", schema: anySchema });
+      storage.registerCollection({ name: "test2", schema: anySchema });
       storage.create("test1", { id: "1", name: "test", value: 1 });
       storage.create("test2", { id: "1", name: "test", value: 1 });
       storage.clearAll();
@@ -40,7 +43,7 @@ describe("Storage - Clear Operations", () => {
     });
 
     it("should keep collection registrations after clearAll", () => {
-      storage.registerCollection({ name: "test" });
+      storage.registerCollection({ name: "test", schema: anySchema });
       storage.create("test", { id: "1", name: "test", value: 1 });
       storage.clearAll();
       expect(storage.hasCollection("test")).toBe(true);
@@ -48,7 +51,7 @@ describe("Storage - Clear Operations", () => {
     });
 
     it("should allow creating entities after clearAll", () => {
-      storage.registerCollection({ name: "test" });
+      storage.registerCollection({ name: "test", schema: anySchema });
       storage.create("test", { id: "1" });
       storage.clearAll();
       const entity = storage.create("test", { id: "2" });
