@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { Storage } from "../src/storage.js";
-import type { Entity, EntityInput } from "../src/storage.js";
-import { EntityAlreadyExistsError, EntityNotFoundError } from "../src/errors.js";
+import { Storage, EntityAlreadyExistsError, EntityNotFoundError } from "../src/index.js";
+import type { Entity, EntityInput } from "../src/index.js";
 
 interface TestEntity extends Entity {
   name: string;

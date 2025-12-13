@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { Storage } from "../src/index.js";
+import { Storage, ValidationError } from "../src/index.js";
 import type { Entity, EntityInput, JSONSchemaType } from "../src/index.js";
-import { ValidationError } from "../src/errors.js";
 
 interface TestEntity extends Entity {
   name: string;

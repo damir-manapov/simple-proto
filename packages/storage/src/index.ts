@@ -1,6 +1,6 @@
 export { Storage } from "./storage.js";
-export type { Entity, EntityInput, CollectionConfig, IStorage } from "./storage.js";
-export type { JSONSchemaType, Schema } from "ajv";
+export type { Entity, EntityInput, CollectionConfig, Schema, IStorage } from "./types.js";
+export type { JSONSchemaType } from "ajv";
 export {
   StorageError,
   CollectionNotFoundError,

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { Storage } from "../src/storage.js";
+import { Storage } from "../src/index.js";
 
 describe("Storage - Clear Operations", () => {
   let storage: Storage;

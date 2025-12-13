@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { Storage } from "../src/index.js";
+import { Storage, CollectionAlreadyExistsError, CollectionNotFoundError } from "../src/index.js";
 import type { EntityInput, JSONSchemaType } from "../src/index.js";
-import { CollectionAlreadyExistsError, CollectionNotFoundError } from "../src/errors.js";
 
 interface TestEntityInput extends EntityInput {
   name: string;
