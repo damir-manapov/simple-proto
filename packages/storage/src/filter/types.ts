@@ -10,6 +10,13 @@ export type StringOperator = { contains: string } | { startsWith: string } | { e
 // Operators only for dates
 export type DateOperator = { before: Date } | { after: Date } | { between: [Date, Date] };
 
+// Relation existence operators (for reverse relation queries)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type RelationOperator<TRelated = any> =
+  | { some: Filter<TRelated> | true }
+  | { none: Filter<TRelated> | true }
+  | { every: Filter<TRelated> };
+
 // Combined based on field type
 export type FilterOperatorFor<T> = T extends Date
   ? AnyOperator<T> | DateOperator

@@ -6,6 +6,7 @@ import type {
   NumberOperator,
   StringOperator,
   DateOperator,
+  RelationOperator,
 } from "./types.js";
 
 // Runtime union of all operator types
@@ -28,12 +29,22 @@ const OPERATOR_KEYS = [
   "between",
 ];
 
+const RELATION_OPERATOR_KEYS = ["some", "none", "every"];
+
 export function isOperator(value: unknown): value is AnyFilterOperator {
   if (typeof value !== "object" || value === null) return false;
   const keys = Object.keys(value);
   if (keys.length !== 1) return false;
   const key = keys[0];
   return key !== undefined && OPERATOR_KEYS.includes(key);
+}
+
+export function isRelationOperator(value: unknown): value is RelationOperator {
+  if (typeof value !== "object" || value === null) return false;
+  const keys = Object.keys(value);
+  if (keys.length !== 1) return false;
+  const key = keys[0];
+  return key !== undefined && RELATION_OPERATOR_KEYS.includes(key);
 }
 
 export function matchesOperator(fieldValue: unknown, operator: AnyFilterOperator): boolean {

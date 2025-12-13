@@ -8,7 +8,7 @@ import {
   EntryNotFoundError,
   ValidationError,
 } from "./errors.js";
-import { isOperator, matchesOperator } from "./filter/index.js";
+import { isOperator, isRelationOperator, matchesOperator } from "./filter/index.js";
 import type {
   CollectionConfig,
   CollectionRelations,
@@ -69,10 +69,26 @@ class Repository<
 
     // Handle filter condition
     const relations = this.storage.getCollectionRelations(this.collectionName);
+    const reverseRelations = this.storage.getReverseRelations(this.collectionName);
 
     for (const key of Object.keys(filter)) {
       const filterValue = (filter as Record<string, unknown>)[key];
       if (filterValue === undefined) continue;
+
+      // Check if this is a reverse relation filter (some/none/every)
+      if (
+        typeof filterValue === "object" &&
+        filterValue !== null &&
+        isRelationOperator(filterValue)
+      ) {
+        const reverseRelation = reverseRelations[key];
+        if (reverseRelation) {
+          if (!this.matchesReverseRelation(entry, reverseRelation, filterValue)) {
+            return false;
+          }
+          continue;
+        }
+      }
 
       // Check if this is a relation filter (object but not an operator)
       if (typeof filterValue === "object" && filterValue !== null && !isOperator(filterValue)) {
@@ -126,6 +142,64 @@ class Repository<
     // Check if the related entity matches the filter
     const matchingRelated = this.storage.getRepository(targetCollection).findAll(relationFilter);
     return matchingRelated.some((e) => e.id === foreignKeyValue);
+  }
+
+  private matchesReverseRelation(
+    entry: T,
+    reverseRelation: { collection: string; field: string },
+    operator: Record<string, unknown>
+  ): boolean {
+    const { collection, field } = reverseRelation;
+    const relatedEntities = this.storage.findAll(collection);
+
+    // Find all entities that reference this entry
+    const referencingEntities = relatedEntities.filter((related) => {
+      const fkValue = (related as unknown as Record<string, unknown>)[field];
+      if (Array.isArray(fkValue)) {
+        return fkValue.includes(entry.id);
+      }
+      return fkValue === entry.id;
+    });
+
+    if ("some" in operator) {
+      const condition = operator["some"];
+      if (condition === true) {
+        // Just check existence
+        return referencingEntities.length > 0;
+      }
+      // Check if at least one matches the filter
+      const repo = this.storage.getRepository(collection);
+      return referencingEntities.some((e) =>
+        repo.findAll(condition as Filter<Entry>).some((matched) => matched.id === e.id)
+      );
+    }
+
+    if ("none" in operator) {
+      const condition = operator["none"];
+      if (condition === true) {
+        // No referencing entities at all
+        return referencingEntities.length === 0;
+      }
+      // None should match the filter
+      const repo = this.storage.getRepository(collection);
+      return !referencingEntities.some((e) =>
+        repo.findAll(condition as Filter<Entry>).some((matched) => matched.id === e.id)
+      );
+    }
+
+    if ("every" in operator) {
+      const condition = operator["every"] as Filter<Entry>;
+      if (referencingEntities.length === 0) {
+        // Vacuously true if no related entities
+        return true;
+      }
+      // All referencing entities must match the filter
+      const repo = this.storage.getRepository(collection);
+      const matchingIds = new Set(repo.findAll(condition).map((e) => e.id));
+      return referencingEntities.every((e) => matchingIds.has(e.id));
+    }
+
+    return false;
   }
 
   update(id: string, data: T): T | null {
@@ -207,6 +281,33 @@ export class Storage implements IStorage {
     }
 
     return relations;
+  }
+
+  /**
+   * Get reverse relations: collections that reference this collection via x-link-to
+   * Returns a map of virtual field names to { collection, field } objects
+   */
+  getReverseRelations(name: string): Record<string, { collection: string; field: string }> {
+    // Verify the collection exists
+    this.getCollectionData(name);
+
+    const reverseRelations: Record<string, { collection: string; field: string }> = {};
+
+    // Iterate over all collections to find those that reference this collection
+    for (const collectionName of this.getCollections()) {
+      if (collectionName === name) continue;
+
+      const relations = this.getCollectionRelations(collectionName);
+      for (const [fieldName, targetCollection] of Object.entries(relations)) {
+        if (targetCollection === name) {
+          // Use collection name as the virtual field name for reverse lookup
+          // e.g., posts.authorId -> users will create "posts" on users
+          reverseRelations[collectionName] = { collection: collectionName, field: fieldName };
+        }
+      }
+    }
+
+    return reverseRelations;
   }
 
   getRepository<T extends Entry = Entry, TInput extends EntryInput = EntryInput>(

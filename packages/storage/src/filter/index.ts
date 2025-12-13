@@ -6,5 +6,6 @@ export type {
   NumberOperator,
   StringOperator,
   DateOperator,
+  RelationOperator,
 } from "./types.js";
-export { isOperator, matchesFilter, matchesOperator } from "./filter.js";
+export { isOperator, isRelationOperator, matchesFilter, matchesOperator } from "./filter.js";
