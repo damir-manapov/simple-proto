@@ -1,7 +1,16 @@
 import type { Entry } from "../types.js";
-import type { Filter, FilterCondition, FilterOperator } from "./types.js";
+import type {
+  Filter,
+  FilterCondition,
+  AnyOperator,
+  NumberOperator,
+  StringOperator,
+} from "./types.js";
 
-export function isFilterOperator(value: unknown): value is FilterOperator {
+// Runtime union of all operator types
+type AnyFilterOperator = AnyOperator<unknown> | NumberOperator | StringOperator;
+
+export function isFilterOperator(value: unknown): value is AnyFilterOperator {
   if (typeof value !== "object" || value === null) return false;
   const keys = Object.keys(value);
   if (keys.length !== 1) return false;
@@ -24,7 +33,7 @@ export function isFilterOperator(value: unknown): value is FilterOperator {
   );
 }
 
-export function matchesOperator(fieldValue: unknown, operator: FilterOperator): boolean {
+export function matchesOperator(fieldValue: unknown, operator: AnyFilterOperator): boolean {
   if ("$eq" in operator) return fieldValue === operator.$eq;
   if ("$ne" in operator) return fieldValue !== operator.$ne;
   if ("$gt" in operator) return typeof fieldValue === "number" && fieldValue > operator.$gt;

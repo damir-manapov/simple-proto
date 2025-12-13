@@ -7,7 +7,10 @@ export type {
   Schema,
   Filter,
   FilterCondition,
-  FilterOperator,
+  FilterOperatorFor,
+  AnyOperator,
+  NumberOperator,
+  StringOperator,
   IRepository,
   IStorage,
 } from "./types.js";

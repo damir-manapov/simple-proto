@@ -1,7 +1,14 @@
 import type { Schema } from "ajv";
 
 export type { Schema };
-export type { Filter, FilterCondition, FilterOperator } from "./filter/types.js";
+export type {
+  Filter,
+  FilterCondition,
+  FilterOperatorFor,
+  AnyOperator,
+  NumberOperator,
+  StringOperator,
+} from "./filter/types.js";
 
 import type { Filter } from "./filter/types.js";
 
