@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { AppController } from "./app.controller.js";
 import { AppService } from "./app.service.js";
-import { CalcModule } from "./calc.module.js";
+import { CalcModule } from "../calc/calc.module.js";
 
 @Module({
   imports: [CalcModule],
