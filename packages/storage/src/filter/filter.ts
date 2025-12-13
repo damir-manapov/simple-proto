@@ -5,10 +5,11 @@ import type {
   AnyOperator,
   NumberOperator,
   StringOperator,
+  DateOperator,
 } from "./types.js";
 
 // Runtime union of all operator types
-type AnyFilterOperator = AnyOperator<unknown> | NumberOperator | StringOperator;
+type AnyFilterOperator = AnyOperator<unknown> | NumberOperator | StringOperator | DateOperator;
 
 export function isFilterOperator(value: unknown): value is AnyFilterOperator {
   if (typeof value !== "object" || value === null) return false;
@@ -29,6 +30,9 @@ export function isFilterOperator(value: unknown): value is AnyFilterOperator {
       "$contains",
       "$startsWith",
       "$endsWith",
+      "$before",
+      "$after",
+      "$between",
     ].includes(key)
   );
 }
@@ -48,6 +52,15 @@ export function matchesOperator(fieldValue: unknown, operator: AnyFilterOperator
     return typeof fieldValue === "string" && fieldValue.startsWith(operator.$startsWith);
   if ("$endsWith" in operator)
     return typeof fieldValue === "string" && fieldValue.endsWith(operator.$endsWith);
+  if ("$before" in operator)
+    return fieldValue instanceof Date && fieldValue.getTime() < operator.$before.getTime();
+  if ("$after" in operator)
+    return fieldValue instanceof Date && fieldValue.getTime() > operator.$after.getTime();
+  if ("$between" in operator) {
+    if (!(fieldValue instanceof Date)) return false;
+    const time = fieldValue.getTime();
+    return time >= operator.$between[0].getTime() && time <= operator.$between[1].getTime();
+  }
   return false;
 }
 

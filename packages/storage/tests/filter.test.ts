@@ -54,6 +54,18 @@ describe("Filter", () => {
       expect(isFilterOperator({ $endsWith: "test" })).toBe(true);
     });
 
+    it("should return true for $before operator", () => {
+      expect(isFilterOperator({ $before: new Date() })).toBe(true);
+    });
+
+    it("should return true for $after operator", () => {
+      expect(isFilterOperator({ $after: new Date() })).toBe(true);
+    });
+
+    it("should return true for $between operator", () => {
+      expect(isFilterOperator({ $between: [new Date(), new Date()] })).toBe(true);
+    });
+
     it("should return false for plain value", () => {
       expect(isFilterOperator("value")).toBe(false);
     });
@@ -203,6 +215,99 @@ describe("Filter", () => {
 
       it("should not match non-suffix", () => {
         expect(matchesOperator("hello world", { $endsWith: "hello" })).toBe(false);
+      });
+    });
+
+    describe("$before", () => {
+      it("should match date before target", () => {
+        const date = new Date("2025-01-15");
+        const target = new Date("2025-02-01");
+        expect(matchesOperator(date, { $before: target })).toBe(true);
+      });
+
+      it("should not match date after target", () => {
+        const date = new Date("2025-03-01");
+        const target = new Date("2025-02-01");
+        expect(matchesOperator(date, { $before: target })).toBe(false);
+      });
+
+      it("should not match equal date", () => {
+        const date = new Date("2025-02-01");
+        const target = new Date("2025-02-01");
+        expect(matchesOperator(date, { $before: target })).toBe(false);
+      });
+
+      it("should return false for non-date", () => {
+        expect(matchesOperator("2025-01-15", { $before: new Date("2025-02-01") })).toBe(false);
+      });
+    });
+
+    describe("$after", () => {
+      it("should match date after target", () => {
+        const date = new Date("2025-03-01");
+        const target = new Date("2025-02-01");
+        expect(matchesOperator(date, { $after: target })).toBe(true);
+      });
+
+      it("should not match date before target", () => {
+        const date = new Date("2025-01-15");
+        const target = new Date("2025-02-01");
+        expect(matchesOperator(date, { $after: target })).toBe(false);
+      });
+
+      it("should not match equal date", () => {
+        const date = new Date("2025-02-01");
+        const target = new Date("2025-02-01");
+        expect(matchesOperator(date, { $after: target })).toBe(false);
+      });
+
+      it("should return false for non-date", () => {
+        expect(matchesOperator("2025-03-01", { $after: new Date("2025-02-01") })).toBe(false);
+      });
+    });
+
+    describe("$between", () => {
+      it("should match date within range", () => {
+        const date = new Date("2025-02-15");
+        const start = new Date("2025-02-01");
+        const end = new Date("2025-02-28");
+        expect(matchesOperator(date, { $between: [start, end] })).toBe(true);
+      });
+
+      it("should match date at start of range", () => {
+        const date = new Date("2025-02-01");
+        const start = new Date("2025-02-01");
+        const end = new Date("2025-02-28");
+        expect(matchesOperator(date, { $between: [start, end] })).toBe(true);
+      });
+
+      it("should match date at end of range", () => {
+        const date = new Date("2025-02-28");
+        const start = new Date("2025-02-01");
+        const end = new Date("2025-02-28");
+        expect(matchesOperator(date, { $between: [start, end] })).toBe(true);
+      });
+
+      it("should not match date before range", () => {
+        const date = new Date("2025-01-15");
+        const start = new Date("2025-02-01");
+        const end = new Date("2025-02-28");
+        expect(matchesOperator(date, { $between: [start, end] })).toBe(false);
+      });
+
+      it("should not match date after range", () => {
+        const date = new Date("2025-03-15");
+        const start = new Date("2025-02-01");
+        const end = new Date("2025-02-28");
+        expect(matchesOperator(date, { $between: [start, end] })).toBe(false);
+      });
+
+      it("should return false for non-date", () => {
+        expect(
+          matchesOperator("2025-02-15", {
+            $between: [new Date("2025-02-01"), new Date("2025-02-28")],
+          })
+        ).toBe(false);
       });
     });
   });

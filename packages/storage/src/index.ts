@@ -11,6 +11,7 @@ export type {
   AnyOperator,
   NumberOperator,
   StringOperator,
+  DateOperator,
   IRepository,
   IStorage,
 } from "./types.js";

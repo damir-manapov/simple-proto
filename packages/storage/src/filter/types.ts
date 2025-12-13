@@ -14,12 +14,17 @@ export type StringOperator =
   | { $startsWith: string }
   | { $endsWith: string };
 
+// Operators only for dates
+export type DateOperator = { $before: Date } | { $after: Date } | { $between: [Date, Date] };
+
 // Combined based on field type
-export type FilterOperatorFor<T> = T extends number
-  ? AnyOperator<T> | NumberOperator
-  : T extends string
-    ? AnyOperator<T> | StringOperator
-    : AnyOperator<T>;
+export type FilterOperatorFor<T> = T extends Date
+  ? AnyOperator<T> | DateOperator
+  : T extends number
+    ? AnyOperator<T> | NumberOperator
+    : T extends string
+      ? AnyOperator<T> | StringOperator
+      : AnyOperator<T>;
 
 export type FilterCondition<T> = {
   [K in keyof T]?: FilterOperatorFor<T[K]>;

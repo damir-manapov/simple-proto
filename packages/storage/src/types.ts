@@ -8,6 +8,7 @@ export type {
   AnyOperator,
   NumberOperator,
   StringOperator,
+  DateOperator,
 } from "./filter/types.js";
 
 import type { Filter } from "./filter/types.js";

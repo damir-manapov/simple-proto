@@ -5,5 +5,6 @@ export type {
   AnyOperator,
   NumberOperator,
   StringOperator,
+  DateOperator,
 } from "./types.js";
 export { isFilterOperator, matchesFilter, matchesOperator } from "./filter.js";
