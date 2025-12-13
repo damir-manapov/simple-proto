@@ -3,10 +3,10 @@ export interface Entity {
 }
 
 export interface IStorage {
-  create<T extends Entity>(collection: string, entity: T): T;
-  findById(collection: string, id: string): Entity | undefined;
+  create<T extends Entity>(collection: string, data: T): T;
+  findById(collection: string, id: string): Entity | null;
   findAll(collection: string): Entity[];
-  update<T extends Entity>(collection: string, id: string, data: T): T | undefined;
+  update<T extends Entity>(collection: string, id: string, data: T): T | null;
   delete(collection: string, id: string): boolean;
   clear(collection: string): void;
   clearAll(): void;
@@ -23,28 +23,28 @@ export class Storage implements IStorage {
     return this.collections.get(name)!;
   }
 
-  create<T extends Entity>(collection: string, entity: T): T {
+  create<T extends Entity>(collection: string, data: T): T {
     const col = this.getCollection(collection);
-    if (col.has(entity.id)) {
-      throw new Error(`Entity with id ${entity.id} already exists`);
+    if (col.has(data.id)) {
+      throw new Error(`Entity with id ${data.id} already exists`);
     }
-    col.set(entity.id, entity);
-    return entity;
+    col.set(data.id, data);
+    return data;
   }
 
-  findById(collection: string, id: string): Entity | undefined {
-    return this.getCollection(collection).get(id);
+  findById(collection: string, id: string): Entity | null {
+    return this.getCollection(collection).get(id) ?? null;
   }
 
   findAll(collection: string): Entity[] {
     return Array.from(this.getCollection(collection).values());
   }
 
-  update<T extends Entity>(collection: string, id: string, data: T): T | undefined {
+  update<T extends Entity>(collection: string, id: string, data: T): T | null {
     const col = this.getCollection(collection);
     const existing = col.get(id);
     if (!existing) {
-      return undefined;
+      return null;
     }
     col.set(id, data);
     return data;

@@ -36,9 +36,9 @@ describe("Storage", () => {
       expect(result).toEqual(entity);
     });
 
-    it("should return undefined for non-existent id", () => {
+    it("should return null for non-existent id", () => {
       const result = storage.findById("test", "999");
-      expect(result).toBeUndefined();
+      expect(result).toBeNull();
     });
   });
 
@@ -69,10 +69,10 @@ describe("Storage", () => {
       expect(result).toEqual(updated);
     });
 
-    it("should return undefined for non-existent id", () => {
+    it("should return null for non-existent id", () => {
       const updated: TestEntity = { id: "999", name: "updated", value: 42 };
       const result = storage.update("test", "999", updated);
-      expect(result).toBeUndefined();
+      expect(result).toBeNull();
     });
   });
 
@@ -82,7 +82,7 @@ describe("Storage", () => {
       storage.create("test", entity);
       const result = storage.delete("test", "1");
       expect(result).toBe(true);
-      expect(storage.findById("test", "1")).toBeUndefined();
+      expect(storage.findById("test", "1")).toBeNull();
     });
 
     it("should return false for non-existent id", () => {
