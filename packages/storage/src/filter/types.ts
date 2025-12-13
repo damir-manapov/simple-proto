@@ -1,21 +1,14 @@
 // Operators that work on any type
-export type AnyOperator<T> = { $eq: T } | { $ne: T } | { $in: T[] } | { $nin: T[] };
+export type AnyOperator<T> = { eq: T } | { ne: T } | { in: T[] } | { nin: T[] };
 
 // Operators only for numbers
-export type NumberOperator =
-  | { $gt: number }
-  | { $gte: number }
-  | { $lt: number }
-  | { $lte: number };
+export type NumberOperator = { gt: number } | { gte: number } | { lt: number } | { lte: number };
 
 // Operators only for strings
-export type StringOperator =
-  | { $contains: string }
-  | { $startsWith: string }
-  | { $endsWith: string };
+export type StringOperator = { contains: string } | { startsWith: string } | { endsWith: string };
 
 // Operators only for dates
-export type DateOperator = { $before: Date } | { $after: Date } | { $between: [Date, Date] };
+export type DateOperator = { before: Date } | { after: Date } | { between: [Date, Date] };
 
 // Combined based on field type
 export type FilterOperatorFor<T> = T extends Date
@@ -30,4 +23,4 @@ export type FilterCondition<T> = {
   [K in keyof T]?: FilterOperatorFor<T[K]>;
 };
 
-export type Filter<T> = FilterCondition<T> | { $and: Filter<T>[] } | { $or: Filter<T>[] };
+export type Filter<T> = FilterCondition<T> | { and: Filter<T>[] } | { or: Filter<T>[] };
