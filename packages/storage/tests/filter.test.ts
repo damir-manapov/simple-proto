@@ -219,12 +219,12 @@ describe("Filter", () => {
       expect(matchesFilter(entry, {})).toBe(true);
     });
 
-    it("should match exact value", () => {
-      expect(matchesFilter(entry, { name: "John" })).toBe(true);
+    it("should match exact value with $eq", () => {
+      expect(matchesFilter(entry, { name: { $eq: "John" } })).toBe(true);
     });
 
-    it("should not match different value", () => {
-      expect(matchesFilter(entry, { name: "Jane" })).toBe(false);
+    it("should not match different value with $eq", () => {
+      expect(matchesFilter(entry, { name: { $eq: "Jane" } })).toBe(false);
     });
 
     it("should match with operator", () => {
@@ -234,7 +234,7 @@ describe("Filter", () => {
     it("should match multiple conditions (AND)", () => {
       expect(
         matchesFilter(entry, {
-          name: "John",
+          name: { $eq: "John" },
           age: { $gte: 18 },
         })
       ).toBe(true);
@@ -243,7 +243,7 @@ describe("Filter", () => {
     it("should fail if any condition fails", () => {
       expect(
         matchesFilter(entry, {
-          name: "John",
+          name: { $eq: "John" },
           age: { $lt: 18 },
         })
       ).toBe(false);
@@ -257,7 +257,7 @@ describe("Filter", () => {
       it("should match when all conditions are true", () => {
         expect(
           matchesFilter(entry, {
-            $and: [{ name: "John" }, { age: { $gte: 18 } }],
+            $and: [{ name: { $eq: "John" } }, { age: { $gte: 18 } }],
           })
         ).toBe(true);
       });
@@ -265,7 +265,7 @@ describe("Filter", () => {
       it("should not match when any condition is false", () => {
         expect(
           matchesFilter(entry, {
-            $and: [{ name: "John" }, { age: { $lt: 18 } }],
+            $and: [{ name: { $eq: "John" } }, { age: { $lt: 18 } }],
           })
         ).toBe(false);
       });
@@ -277,7 +277,10 @@ describe("Filter", () => {
       it("should support nested $and", () => {
         expect(
           matchesFilter(entry, {
-            $and: [{ $and: [{ name: "John" }, { age: 30 }] }, { email: { $contains: "@" } }],
+            $and: [
+              { $and: [{ name: { $eq: "John" } }, { age: { $eq: 30 } }] },
+              { email: { $contains: "@" } },
+            ],
           })
         ).toBe(true);
       });
@@ -287,7 +290,7 @@ describe("Filter", () => {
       it("should match when any condition is true", () => {
         expect(
           matchesFilter(entry, {
-            $or: [{ name: "Jane" }, { age: { $gte: 18 } }],
+            $or: [{ name: { $eq: "Jane" } }, { age: { $gte: 18 } }],
           })
         ).toBe(true);
       });
@@ -295,7 +298,7 @@ describe("Filter", () => {
       it("should not match when all conditions are false", () => {
         expect(
           matchesFilter(entry, {
-            $or: [{ name: "Jane" }, { age: { $lt: 18 } }],
+            $or: [{ name: { $eq: "Jane" } }, { age: { $lt: 18 } }],
           })
         ).toBe(false);
       });
@@ -307,7 +310,10 @@ describe("Filter", () => {
       it("should support nested $or", () => {
         expect(
           matchesFilter(entry, {
-            $or: [{ $or: [{ name: "Jane" }, { name: "Jack" }] }, { name: "John" }],
+            $or: [
+              { $or: [{ name: { $eq: "Jane" } }, { name: { $eq: "Jack" } }] },
+              { name: { $eq: "John" } },
+            ],
           })
         ).toBe(true);
       });
@@ -317,7 +323,10 @@ describe("Filter", () => {
       it("should support $or inside $and", () => {
         expect(
           matchesFilter(entry, {
-            $and: [{ $or: [{ name: "John" }, { name: "Jane" }] }, { age: { $gte: 18 } }],
+            $and: [
+              { $or: [{ name: { $eq: "John" } }, { name: { $eq: "Jane" } }] },
+              { age: { $gte: 18 } },
+            ],
           })
         ).toBe(true);
       });
@@ -326,8 +335,8 @@ describe("Filter", () => {
         expect(
           matchesFilter(entry, {
             $or: [
-              { $and: [{ name: "Jane" }, { age: 25 }] },
-              { $and: [{ name: "John" }, { age: 30 }] },
+              { $and: [{ name: { $eq: "Jane" } }, { age: { $eq: 25 } }] },
+              { $and: [{ name: { $eq: "John" } }, { age: { $eq: 30 } }] },
             ],
           })
         ).toBe(true);
@@ -337,8 +346,8 @@ describe("Filter", () => {
         expect(
           matchesFilter(entry, {
             $or: [
-              { $and: [{ name: "Jane" }, { age: 25 }] },
-              { $and: [{ name: "Jack" }, { age: 30 }] },
+              { $and: [{ name: { $eq: "Jane" } }, { age: { $eq: 25 } }] },
+              { $and: [{ name: { $eq: "Jack" } }, { age: { $eq: 30 } }] },
             ],
           })
         ).toBe(false);

@@ -46,10 +46,8 @@ function matchesCondition<T extends Entry>(entry: T, condition: FilterCondition<
   for (const key of Object.keys(condition) as (keyof T)[]) {
     const filterValue = condition[key];
     const entryValue = entry[key];
-    if (isFilterOperator(filterValue)) {
-      if (!matchesOperator(entryValue, filterValue)) return false;
-    } else {
-      if (entryValue !== filterValue) return false;
+    if (filterValue !== undefined && !matchesOperator(entryValue, filterValue)) {
+      return false;
     }
   }
   return true;

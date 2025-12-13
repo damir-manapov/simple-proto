@@ -94,10 +94,10 @@ describe("Repository", () => {
       expect(all).toEqual([]);
     });
 
-    it("should filter by exact value", () => {
+    it("should filter by exact value with $eq", () => {
       userRepo.create({ id: "user-1", name: "John", email: "john@example.com" });
       userRepo.create({ id: "user-2", name: "Jane", email: "jane@example.com" });
-      const filtered = userRepo.findAll({ name: "John" });
+      const filtered = userRepo.findAll({ name: { $eq: "John" } });
       expect(filtered).toHaveLength(1);
       expect(filtered[0]?.name).toBe("John");
     });
@@ -165,7 +165,7 @@ describe("Repository", () => {
       userRepo.create({ id: "user-2", name: "Jane", email: "jane@test.com" });
       userRepo.create({ id: "user-3", name: "Jane", email: "jane@example.com" });
       const filtered = userRepo.findAll({
-        name: "Jane",
+        name: { $eq: "Jane" },
         email: { $endsWith: "@example.com" },
       });
       expect(filtered).toHaveLength(1);
@@ -174,7 +174,7 @@ describe("Repository", () => {
 
     it("should return empty array when filter matches nothing", () => {
       userRepo.create({ id: "user-1", name: "John", email: "john@example.com" });
-      const filtered = userRepo.findAll({ name: "Nobody" });
+      const filtered = userRepo.findAll({ name: { $eq: "Nobody" } });
       expect(filtered).toEqual([]);
     });
   });

@@ -12,7 +12,7 @@ export type FilterOperator =
   | { $endsWith: string };
 
 export type FilterCondition<T> = {
-  [K in keyof T]?: T[K] | FilterOperator;
+  [K in keyof T]?: FilterOperator;
 };
 
 export type Filter<T> = FilterCondition<T> | { $and: Filter<T>[] } | { $or: Filter<T>[] };
