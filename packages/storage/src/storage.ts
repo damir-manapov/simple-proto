@@ -2,7 +2,17 @@ export interface Entity {
   id: string;
 }
 
-export class Storage {
+export interface IStorage {
+  create<T extends Entity>(collection: string, entity: T): T;
+  findById(collection: string, id: string): Entity | undefined;
+  findAll(collection: string): Entity[];
+  update<T extends Entity>(collection: string, id: string, data: T): T | undefined;
+  delete(collection: string, id: string): boolean;
+  clear(collection: string): void;
+  clearAll(): void;
+}
+
+export class Storage implements IStorage {
   private readonly collections = new Map<string, Map<string, Entity>>();
 
   private getCollection(name: string): Map<string, Entity> {
