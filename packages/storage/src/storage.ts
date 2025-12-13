@@ -5,8 +5,10 @@ export interface Entity {
 export interface IStorage {
   create<T extends Entity>(collection: string, data: T): T;
   findById(collection: string, id: string): Entity | null;
+  findByIdOrThrow(collection: string, id: string): Entity;
   findAll(collection: string): Entity[];
   update<T extends Entity>(collection: string, id: string, data: T): T | null;
+  updateOrThrow<T extends Entity>(collection: string, id: string, data: T): T;
   delete(collection: string, id: string): boolean;
   clear(collection: string): void;
   clearAll(): void;
@@ -36,6 +38,14 @@ export class Storage implements IStorage {
     return this.getCollection(collection).get(id) ?? null;
   }
 
+  findByIdOrThrow(collection: string, id: string): Entity {
+    const entity = this.findById(collection, id);
+    if (entity === null) {
+      throw new Error(`Entity with id ${id} not found in collection ${collection}`);
+    }
+    return entity;
+  }
+
   findAll(collection: string): Entity[] {
     return Array.from(this.getCollection(collection).values());
   }
@@ -48,6 +58,14 @@ export class Storage implements IStorage {
     }
     col.set(id, data);
     return data;
+  }
+
+  updateOrThrow<T extends Entity>(collection: string, id: string, data: T): T {
+    const result = this.update(collection, id, data);
+    if (result === null) {
+      throw new Error(`Entity with id ${id} not found in collection ${collection}`);
+    }
+    return result;
   }
 
   delete(collection: string, id: string): boolean {

@@ -42,6 +42,21 @@ describe("Storage", () => {
     });
   });
 
+  describe("findByIdOrThrow", () => {
+    it("should find entity by id", () => {
+      const entity: TestEntity = { id: "1", name: "test", value: 42 };
+      storage.create("test", entity);
+      const result = storage.findByIdOrThrow("test", "1");
+      expect(result).toEqual(entity);
+    });
+
+    it("should throw for non-existent id", () => {
+      expect(() => storage.findByIdOrThrow("test", "999")).toThrow(
+        "Entity with id 999 not found in collection test"
+      );
+    });
+  });
+
   describe("findAll", () => {
     it("should return all entities", () => {
       const entity1: TestEntity = { id: "1", name: "test1", value: 1 };
@@ -73,6 +88,23 @@ describe("Storage", () => {
       const updated: TestEntity = { id: "999", name: "updated", value: 42 };
       const result = storage.update("test", "999", updated);
       expect(result).toBeNull();
+    });
+  });
+
+  describe("updateOrThrow", () => {
+    it("should update an entity", () => {
+      const entity: TestEntity = { id: "1", name: "test", value: 42 };
+      storage.create("test", entity);
+      const updated: TestEntity = { id: "1", name: "updated", value: 42 };
+      const result = storage.updateOrThrow("test", "1", updated);
+      expect(result).toEqual(updated);
+    });
+
+    it("should throw for non-existent id", () => {
+      const updated: TestEntity = { id: "999", name: "updated", value: 42 };
+      expect(() => storage.updateOrThrow("test", "999", updated)).toThrow(
+        "Entity with id 999 not found in collection test"
+      );
     });
   });
 
