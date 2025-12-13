@@ -35,6 +35,7 @@ pnpm install
 packages/
   calc/       - Calculator utilities (add, subtract)
   proto/      - NestJS application prototype
+  storage/    - In-memory storage with collection-based entity management
 ```
 
 ## Running the NestJS App
