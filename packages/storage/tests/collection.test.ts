@@ -1,12 +1,23 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { Storage } from "../src/storage.js";
-import type { EntityInput } from "../src/storage.js";
+import { Storage } from "../src/index.js";
+import type { EntityInput, JSONSchemaType } from "../src/index.js";
 import { CollectionAlreadyExistsError, CollectionNotFoundError } from "../src/errors.js";
 
 interface TestEntityInput extends EntityInput {
   name: string;
   value: number;
 }
+
+const testEntitySchema: JSONSchemaType<TestEntityInput> = {
+  type: "object",
+  properties: {
+    id: { type: "string", nullable: true },
+    name: { type: "string" },
+    value: { type: "number" },
+  },
+  required: ["name", "value"],
+  additionalProperties: false,
+};
 
 describe("Storage - Collection Management", () => {
   let storage: Storage;
@@ -31,12 +42,10 @@ describe("Storage - Collection Management", () => {
       }).toThrow("Collection test is already registered");
     });
 
-    it("should register collection with validation", () => {
-      storage.registerCollection<TestEntityInput>({
+    it("should register collection with schema", () => {
+      storage.registerCollection({
         name: "test",
-        validate: (data) => {
-          return data.name ? true : "Name is required";
-        },
+        schema: testEntitySchema,
       });
       expect(storage.hasCollection("test")).toBe(true);
     });

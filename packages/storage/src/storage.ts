@@ -1,4 +1,6 @@
 import { randomUUID } from "node:crypto";
+import AjvModule from "ajv";
+import type { Schema, ValidateFunction } from "ajv";
 import {
   CollectionAlreadyExistsError,
   CollectionNotFoundError,
@@ -6,6 +8,10 @@ import {
   EntityNotFoundError,
   ValidationError,
 } from "./errors.js";
+
+// Handle CommonJS/ESM interop
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+const Ajv = AjvModule.default ?? AjvModule;
 
 export interface Entity {
   id: string;
@@ -15,15 +21,13 @@ export interface EntityInput {
   id?: string;
 }
 
-export type ValidateFn<T extends EntityInput = EntityInput> = (data: T) => true | string;
-
-export interface CollectionConfig<T extends EntityInput = EntityInput> {
+export interface CollectionConfig {
   name: string;
-  validate?: ValidateFn<T>;
+  schema?: Schema;
 }
 
 export interface IStorage {
-  registerCollection<T extends EntityInput>(config: CollectionConfig<T>): void;
+  registerCollection(config: CollectionConfig): void;
   hasCollection(name: string): boolean;
   getCollections(): string[];
   create<T extends EntityInput>(collection: string, data: T): T & Entity;
@@ -40,19 +44,25 @@ export interface IStorage {
 interface CollectionData {
   config: CollectionConfig;
   entities: Map<string, Entity>;
+  validator?: ValidateFunction;
 }
 
 export class Storage implements IStorage {
   private readonly collections = new Map<string, CollectionData>();
+  private readonly ajv = new Ajv();
 
-  registerCollection<T extends EntityInput>(config: CollectionConfig<T>): void {
+  registerCollection(config: CollectionConfig): void {
     if (this.collections.has(config.name)) {
       throw new CollectionAlreadyExistsError(config.name);
     }
-    this.collections.set(config.name, {
-      config: config as CollectionConfig,
+    const collectionData: CollectionData = {
+      config,
       entities: new Map(),
-    });
+    };
+    if (config.schema) {
+      collectionData.validator = this.ajv.compile(config.schema);
+    }
+    this.collections.set(config.name, collectionData);
   }
 
   hasCollection(name: string): boolean {
@@ -71,24 +81,26 @@ export class Storage implements IStorage {
     return data;
   }
 
-  private validate(collection: string, data: EntityInput, config: CollectionConfig): void {
-    if (config.validate) {
-      const result = config.validate(data);
-      if (result !== true) {
-        throw new ValidationError(collection, result);
+  private validate(collection: string, data: EntityInput, collectionData: CollectionData): void {
+    const { validator } = collectionData;
+    if (validator) {
+      const valid = validator(data);
+      if (!valid) {
+        const message = this.ajv.errorsText(validator.errors);
+        throw new ValidationError(collection, message);
       }
     }
   }
 
   create<T extends EntityInput>(collection: string, data: T): T & Entity {
-    const { config, entities } = this.getCollectionData(collection);
-    this.validate(collection, data, config);
+    const collectionData = this.getCollectionData(collection);
+    this.validate(collection, data, collectionData);
     const id = data.id ?? randomUUID();
     const entity = { ...data, id } as T & Entity;
-    if (entities.has(id)) {
+    if (collectionData.entities.has(id)) {
       throw new EntityAlreadyExistsError(collection, id);
     }
-    entities.set(id, entity);
+    collectionData.entities.set(id, entity);
     return entity;
   }
 
@@ -111,13 +123,13 @@ export class Storage implements IStorage {
   }
 
   update<T extends Entity>(collection: string, id: string, data: T): T | null {
-    const { config, entities } = this.getCollectionData(collection);
-    this.validate(collection, data, config);
-    const existing = entities.get(id);
+    const collectionData = this.getCollectionData(collection);
+    this.validate(collection, data, collectionData);
+    const existing = collectionData.entities.get(id);
     if (!existing) {
       return null;
     }
-    entities.set(id, data);
+    collectionData.entities.set(id, data);
     return data;
   }
 

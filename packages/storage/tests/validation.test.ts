@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { Storage } from "../src/storage.js";
-import type { Entity, EntityInput } from "../src/storage.js";
+import { Storage } from "../src/index.js";
+import type { Entity, EntityInput, JSONSchemaType } from "../src/index.js";
 import { ValidationError } from "../src/errors.js";
 
 interface TestEntity extends Entity {
@@ -13,6 +13,17 @@ interface TestEntityInput extends EntityInput {
   value: number;
 }
 
+const testEntitySchema: JSONSchemaType<TestEntityInput> = {
+  type: "object",
+  properties: {
+    id: { type: "string", nullable: true },
+    name: { type: "string" },
+    value: { type: "number", minimum: 1 },
+  },
+  required: ["name", "value"],
+  additionalProperties: false,
+};
+
 describe("Storage - Validation", () => {
   let storage: Storage;
 
@@ -21,25 +32,21 @@ describe("Storage - Validation", () => {
   });
 
   it("should validate on create", () => {
-    storage.registerCollection<TestEntityInput>({
+    storage.registerCollection({
       name: "validated",
-      validate: (data) => {
-        return data.value > 0 ? true : "Value must be positive";
-      },
+      schema: testEntitySchema,
     });
     const invalidInput: TestEntityInput = { name: "test", value: -1 };
     expect(() => storage.create("validated", invalidInput)).toThrow(ValidationError);
     expect(() => storage.create("validated", invalidInput)).toThrow(
-      "Validation failed for collection validated: Value must be positive"
+      "Validation failed for collection validated: data/value must be >= 1"
     );
   });
 
   it("should validate on update", () => {
-    storage.registerCollection<TestEntityInput>({
+    storage.registerCollection({
       name: "validated",
-      validate: (data) => {
-        return data.value > 0 ? true : "Value must be positive";
-      },
+      schema: testEntitySchema,
     });
     const validInput: TestEntityInput = { id: "1", name: "test", value: 1 };
     storage.create("validated", validInput);
@@ -48,11 +55,9 @@ describe("Storage - Validation", () => {
   });
 
   it("should pass validation for valid data", () => {
-    storage.registerCollection<TestEntityInput>({
+    storage.registerCollection({
       name: "validated",
-      validate: (data) => {
-        return data.value > 0 ? true : "Value must be positive";
-      },
+      schema: testEntitySchema,
     });
     const input: TestEntityInput = { name: "test", value: 42 };
     const result = storage.create<TestEntityInput>("validated", input);

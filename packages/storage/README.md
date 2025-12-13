@@ -1,6 +1,6 @@
 # @simple-proto/storage
 
-In-memory storage with collection-based entity management and validation.
+In-memory storage with collection-based entity management and JSON Schema validation.
 
 ## Installation
 
@@ -11,7 +11,13 @@ pnpm add @simple-proto/storage
 ## Usage
 
 ```typescript
-import { Storage, Entity, EntityInput, CollectionConfig } from "@simple-proto/storage";
+import {
+  Storage,
+  Entity,
+  EntityInput,
+  CollectionConfig,
+  JSONSchemaType,
+} from "@simple-proto/storage";
 
 interface User extends Entity {
   name: string;
@@ -23,18 +29,26 @@ interface UserInput extends EntityInput {
   email: string;
 }
 
+const userSchema: JSONSchemaType<UserInput> = {
+  type: "object",
+  properties: {
+    id: { type: "string", nullable: true },
+    name: { type: "string" },
+    email: { type: "string", format: "email" },
+  },
+  required: ["name", "email"],
+  additionalProperties: false,
+};
+
 const storage = new Storage();
 
 // Register collections before use (strict mode)
 storage.registerCollection({ name: "users" });
 
-// Register with validation
-storage.registerCollection<UserInput>({
+// Register with JSON Schema validation
+storage.registerCollection({
   name: "posts",
-  validate: (data) => {
-    if (!data.name) return "Name is required";
-    return true;
-  },
+  schema: userSchema,
 });
 
 // Create with auto-generated ID
@@ -99,9 +113,9 @@ interface EntityInput {
 Configuration for collection registration:
 
 ```typescript
-interface CollectionConfig<T extends EntityInput = EntityInput> {
+interface CollectionConfig {
   name: string;
-  validate?: (data: T) => true | string; // true = valid, string = error message
+  schema?: Schema; // JSON Schema for validation
 }
 ```
 
