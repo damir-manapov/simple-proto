@@ -1,8 +1,14 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { Storage } from "../src/storage.js";
-import type { Entity } from "../src/storage.js";
+import type { Entity, EntityInput } from "../src/storage.js";
+import { EntityAlreadyExistsError, EntityNotFoundError } from "../src/errors.js";
 
 interface TestEntity extends Entity {
+  name: string;
+  value: number;
+}
+
+interface TestEntityInput extends EntityInput {
   name: string;
   value: number;
 }
@@ -15,16 +21,37 @@ describe("Storage", () => {
   });
 
   describe("create", () => {
-    it("should create an entity", () => {
+    it("should create an entity with provided id", () => {
       const entity: TestEntity = { id: "1", name: "test", value: 42 };
       const result = storage.create("test", entity);
       expect(result).toEqual(entity);
     });
 
-    it("should throw error when creating duplicate id", () => {
+    it("should auto-generate id when not provided", () => {
+      const input: TestEntityInput = { name: "test", value: 42 };
+      const result = storage.create("test", input);
+      expect(result.id).toBeDefined();
+      expect(typeof result.id).toBe("string");
+      expect(result.id.length).toBeGreaterThan(0);
+      expect(result.name).toBe("test");
+      expect(result.value).toBe(42);
+    });
+
+    it("should generate unique ids for multiple entities", () => {
+      const input1: TestEntityInput = { name: "test1", value: 1 };
+      const input2: TestEntityInput = { name: "test2", value: 2 };
+      const result1 = storage.create("test", input1);
+      const result2 = storage.create("test", input2);
+      expect(result1.id).not.toBe(result2.id);
+    });
+
+    it("should throw EntityAlreadyExistsError when creating duplicate id", () => {
       const entity: TestEntity = { id: "1", name: "test", value: 42 };
       storage.create("test", entity);
-      expect(() => storage.create("test", entity)).toThrow("Entity with id 1 already exists");
+      expect(() => storage.create("test", entity)).toThrow(EntityAlreadyExistsError);
+      expect(() => storage.create("test", entity)).toThrow(
+        "Entity with id 1 already exists in collection test"
+      );
     });
   });
 
@@ -50,7 +77,8 @@ describe("Storage", () => {
       expect(result).toEqual(entity);
     });
 
-    it("should throw for non-existent id", () => {
+    it("should throw EntityNotFoundError for non-existent id", () => {
+      expect(() => storage.findByIdOrThrow("test", "999")).toThrow(EntityNotFoundError);
       expect(() => storage.findByIdOrThrow("test", "999")).toThrow(
         "Entity with id 999 not found in collection test"
       );

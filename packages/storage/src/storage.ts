@@ -1,11 +1,16 @@
+import { randomUUID } from "node:crypto";
 import { EntityAlreadyExistsError, EntityNotFoundError } from "./errors.js";
 
 export interface Entity {
   id: string;
 }
 
+export interface EntityInput {
+  id?: string;
+}
+
 export interface IStorage {
-  create<T extends Entity>(collection: string, data: T): T;
+  create<T extends EntityInput>(collection: string, data: T): T & Entity;
   findById(collection: string, id: string): Entity | null;
   findByIdOrThrow(collection: string, id: string): Entity;
   findAll(collection: string): Entity[];
@@ -27,13 +32,15 @@ export class Storage implements IStorage {
     return this.collections.get(name)!;
   }
 
-  create<T extends Entity>(collection: string, data: T): T {
+  create<T extends EntityInput>(collection: string, data: T): T & Entity {
+    const id = data.id ?? randomUUID();
+    const entity = { ...data, id } as T & Entity;
     const col = this.getCollection(collection);
-    if (col.has(data.id)) {
-      throw new EntityAlreadyExistsError(collection, data.id);
+    if (col.has(id)) {
+      throw new EntityAlreadyExistsError(collection, id);
     }
-    col.set(data.id, data);
-    return data;
+    col.set(id, entity);
+    return entity;
   }
 
   findById(collection: string, id: string): Entity | null {
