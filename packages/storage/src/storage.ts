@@ -1,3 +1,5 @@
+import { EntityAlreadyExistsError, EntityNotFoundError } from "./errors.js";
+
 export interface Entity {
   id: string;
 }
@@ -28,7 +30,7 @@ export class Storage implements IStorage {
   create<T extends Entity>(collection: string, data: T): T {
     const col = this.getCollection(collection);
     if (col.has(data.id)) {
-      throw new Error(`Entity with id ${data.id} already exists`);
+      throw new EntityAlreadyExistsError(collection, data.id);
     }
     col.set(data.id, data);
     return data;
@@ -41,7 +43,7 @@ export class Storage implements IStorage {
   findByIdOrThrow(collection: string, id: string): Entity {
     const entity = this.findById(collection, id);
     if (entity === null) {
-      throw new Error(`Entity with id ${id} not found in collection ${collection}`);
+      throw new EntityNotFoundError(collection, id);
     }
     return entity;
   }
@@ -63,7 +65,7 @@ export class Storage implements IStorage {
   updateOrThrow<T extends Entity>(collection: string, id: string, data: T): T {
     const result = this.update(collection, id, data);
     if (result === null) {
-      throw new Error(`Entity with id ${id} not found in collection ${collection}`);
+      throw new EntityNotFoundError(collection, id);
     }
     return result;
   }
