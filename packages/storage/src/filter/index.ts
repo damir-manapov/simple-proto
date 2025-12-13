@@ -7,4 +7,4 @@ export type {
   StringOperator,
   DateOperator,
 } from "./types.js";
-export { matchesFilter, matchesOperator } from "./filter.js";
+export { isOperator, matchesFilter, matchesOperator } from "./filter.js";

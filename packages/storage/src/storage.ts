@@ -8,7 +8,7 @@ import {
   EntryNotFoundError,
   ValidationError,
 } from "./errors.js";
-import { matchesFilter } from "./filter/index.js";
+import { isOperator, matchesOperator } from "./filter/index.js";
 import type {
   CollectionConfig,
   CollectionRelations,
@@ -53,7 +53,79 @@ class Repository<
 
   findAll(filter?: Filter<T>): T[] {
     const all = this.storage.findAll(this.collectionName) as T[];
-    return filter ? all.filter((entry) => matchesFilter(entry, filter)) : all;
+    if (!filter) return all;
+
+    return all.filter((entry) => this.matchesFilterWithRelations(entry, filter));
+  }
+
+  private matchesFilterWithRelations(entry: T, filter: Filter<T>): boolean {
+    // Handle and/or operators
+    if ("and" in filter) {
+      return filter.and.every((subFilter) => this.matchesFilterWithRelations(entry, subFilter));
+    }
+    if ("or" in filter) {
+      return filter.or.some((subFilter) => this.matchesFilterWithRelations(entry, subFilter));
+    }
+
+    // Handle filter condition
+    const relations = this.storage.getCollectionRelations(this.collectionName);
+
+    for (const key of Object.keys(filter)) {
+      const filterValue = (filter as Record<string, unknown>)[key];
+      if (filterValue === undefined) continue;
+
+      // Check if this is a relation filter (object but not an operator)
+      if (typeof filterValue === "object" && filterValue !== null && !isOperator(filterValue)) {
+        const targetCollection = relations[key];
+        if (targetCollection) {
+          // This is a relation filter - resolve it
+          const foreignKeyValue = (entry as Record<string, unknown>)[key];
+          if (
+            !this.matchesRelation(foreignKeyValue, targetCollection, filterValue as Filter<Entry>)
+          ) {
+            return false;
+          }
+          continue;
+        }
+      }
+
+      // Regular field filter
+      const entryValue = (entry as Record<string, unknown>)[key];
+      if (!matchesOperator(entryValue, filterValue as Parameters<typeof matchesOperator>[1])) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  private matchesRelation(
+    foreignKeyValue: unknown,
+    targetCollection: string,
+    relationFilter: Filter<Entry>
+  ): boolean {
+    // Handle array of foreign keys (e.g., tagIds: ["tag-1", "tag-2"])
+    if (Array.isArray(foreignKeyValue)) {
+      // At least one related entity must match
+      return foreignKeyValue.some((fkId) => {
+        if (typeof fkId !== "string") return false;
+        const related = this.storage.findById(targetCollection, fkId);
+        if (!related) return false;
+        return this.storage
+          .getRepository(targetCollection)
+          .findAll(relationFilter)
+          .some((e) => e.id === fkId);
+      });
+    }
+
+    // Single foreign key
+    if (typeof foreignKeyValue !== "string") return false;
+    const related = this.storage.findById(targetCollection, foreignKeyValue);
+    if (!related) return false;
+
+    // Check if the related entity matches the filter
+    const matchingRelated = this.storage.getRepository(targetCollection).findAll(relationFilter);
+    return matchingRelated.some((e) => e.id === foreignKeyValue);
   }
 
   update(id: string, data: T): T | null {

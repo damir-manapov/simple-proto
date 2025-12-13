@@ -11,6 +11,31 @@ import type {
 // Runtime union of all operator types
 type AnyFilterOperator = AnyOperator<unknown> | NumberOperator | StringOperator | DateOperator;
 
+const OPERATOR_KEYS = [
+  "eq",
+  "ne",
+  "gt",
+  "gte",
+  "lt",
+  "lte",
+  "in",
+  "nin",
+  "contains",
+  "startsWith",
+  "endsWith",
+  "before",
+  "after",
+  "between",
+];
+
+export function isOperator(value: unknown): value is AnyFilterOperator {
+  if (typeof value !== "object" || value === null) return false;
+  const keys = Object.keys(value);
+  if (keys.length !== 1) return false;
+  const key = keys[0];
+  return key !== undefined && OPERATOR_KEYS.includes(key);
+}
+
 export function matchesOperator(fieldValue: unknown, operator: AnyFilterOperator): boolean {
   if ("eq" in operator) return fieldValue === operator.eq;
   if ("ne" in operator) return fieldValue !== operator.ne;
