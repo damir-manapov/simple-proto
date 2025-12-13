@@ -13,18 +13,18 @@ pnpm add @simple-proto/storage
 ```typescript
 import {
   Storage,
-  Entity,
-  EntityInput,
+  Entry,
+  EntryInput,
   CollectionConfig,
   JSONSchemaType,
 } from "@simple-proto/storage";
 
-interface User extends Entity {
+interface User extends Entry {
   name: string;
   email: string;
 }
 
-interface UserInput extends EntityInput {
+interface UserInput extends EntryInput {
   name: string;
   email: string;
 }
@@ -66,13 +66,13 @@ const user2 = storage.create<UserInput>("users", {
 });
 
 // Read
-const found = storage.findById("users", user.id); // Entity | null
-const foundOrThrow = storage.findByIdOrThrow("users", user.id); // Entity (throws if not found)
-const all = storage.findAll("users"); // Entity[]
+const found = storage.findById("users", user.id); // Entry | null
+const foundOrThrow = storage.findByIdOrThrow("users", user.id); // Entry (throws if not found)
+const all = storage.findAll("users"); // Entry[]
 
 // Update
-const updated = storage.update("users", user.id, { ...user, name: "Johnny" }); // Entity | null
-const updatedOrThrow = storage.updateOrThrow("users", user.id, { ...user, name: "Johnny" }); // Entity (throws if not found)
+const updated = storage.update("users", user.id, { ...user, name: "Johnny" }); // Entry | null
+const updatedOrThrow = storage.updateOrThrow("users", user.id, { ...user, name: "Johnny" }); // Entry (throws if not found)
 
 // Delete
 const deleted = storage.delete("users", user.id); // boolean
@@ -88,22 +88,22 @@ storage.getCollections(); // ["users", "posts"]
 
 ## API
 
-### Entity
+### Entry
 
 Base interface for entities (output with guaranteed id):
 
 ```typescript
-interface Entity {
+interface Entry {
   id: string;
 }
 ```
 
-### EntityInput
+### EntryInput
 
 Base interface for entity input (id is optional, auto-generated if not provided):
 
 ```typescript
-interface EntityInput {
+interface EntryInput {
   id?: string;
 }
 ```
@@ -123,20 +123,20 @@ interface CollectionConfig {
 
 Interface for storage implementations:
 
-| Method                                   | Returns          | Description                                      |
-| ---------------------------------------- | ---------------- | ------------------------------------------------ |
-| `registerCollection(config)`             | `void`           | Register a collection (required before use)      |
-| `hasCollection(name)`                    | `boolean`        | Check if collection is registered                |
-| `getCollections()`                       | `string[]`       | Get all registered collection names              |
-| `create<T>(collection, data)`            | `T & Entity`     | Create entity, auto-generates id if not provided |
-| `findById(collection, id)`               | `Entity \| null` | Find by id, returns null if not found            |
-| `findByIdOrThrow(collection, id)`        | `Entity`         | Find by id, throws if not found                  |
-| `findAll(collection)`                    | `Entity[]`       | Get all entities in collection                   |
-| `update<T>(collection, id, data)`        | `T \| null`      | Update entity, returns null if not found         |
-| `updateOrThrow<T>(collection, id, data)` | `T`              | Update entity, throws if not found               |
-| `delete(collection, id)`                 | `boolean`        | Delete entity, returns success status            |
-| `clear(collection)`                      | `void`           | Clear single collection                          |
-| `clearAll()`                             | `void`           | Clear all collections (keeps registrations)      |
+| Method                                   | Returns         | Description                                      |
+| ---------------------------------------- | --------------- | ------------------------------------------------ |
+| `registerCollection(config)`             | `void`          | Register a collection (required before use)      |
+| `hasCollection(name)`                    | `boolean`       | Check if collection is registered                |
+| `getCollections()`                       | `string[]`      | Get all registered collection names              |
+| `create<T>(collection, data)`            | `T & Entry`     | Create entity, auto-generates id if not provided |
+| `findById(collection, id)`               | `Entry \| null` | Find by id, returns null if not found            |
+| `findByIdOrThrow(collection, id)`        | `Entry`         | Find by id, throws if not found                  |
+| `findAll(collection)`                    | `Entry[]`       | Get all entities in collection                   |
+| `update<T>(collection, id, data)`        | `T \| null`     | Update entity, returns null if not found         |
+| `updateOrThrow<T>(collection, id, data)` | `T`             | Update entity, throws if not found               |
+| `delete(collection, id)`                 | `boolean`       | Delete entity, returns success status            |
+| `clear(collection)`                      | `void`          | Clear single collection                          |
+| `clearAll()`                             | `void`          | Clear all collections (keeps registrations)      |
 
 ## Errors
 
@@ -189,7 +189,7 @@ Thrown when an entity is not found (by `findByIdOrThrow`, `updateOrThrow`).
 Properties:
 
 - `collection: string` - Collection name
-- `id: string` - Entity id
+- `id: string` - Entry id
 
 ### EntityAlreadyExistsError
 
@@ -198,7 +198,7 @@ Thrown when creating an entity with a duplicate id.
 Properties:
 
 - `collection: string` - Collection name
-- `id: string` - Entity id
+- `id: string` - Entry id
 
 ## License
 

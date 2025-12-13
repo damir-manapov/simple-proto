@@ -8,7 +8,7 @@ import {
   EntityNotFoundError,
   ValidationError,
 } from "./errors.js";
-import type { CollectionConfig, Entity, EntityInput, IStorage } from "./types.js";
+import type { CollectionConfig, Entry, EntryInput, IStorage } from "./types.js";
 
 // Handle CommonJS/ESM interop
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -16,7 +16,7 @@ const Ajv = AjvModule.default ?? AjvModule;
 
 interface CollectionData {
   config: CollectionConfig;
-  entities: Map<string, Entity>;
+  entities: Map<string, Entry>;
   validator?: ValidateFunction;
 }
 
@@ -54,7 +54,7 @@ export class Storage implements IStorage {
     return data;
   }
 
-  private validate(collection: string, data: EntityInput, collectionData: CollectionData): void {
+  private validate(collection: string, data: EntryInput, collectionData: CollectionData): void {
     const { validator } = collectionData;
     if (validator) {
       const valid = validator(data);
@@ -65,11 +65,11 @@ export class Storage implements IStorage {
     }
   }
 
-  create<T extends EntityInput>(collection: string, data: T): T & Entity {
+  create<T extends EntryInput>(collection: string, data: T): T & Entry {
     const collectionData = this.getCollectionData(collection);
     this.validate(collection, data, collectionData);
     const id = data.id ?? randomUUID();
-    const entity = { ...data, id } as T & Entity;
+    const entity = { ...data, id } as T & Entry;
     if (collectionData.entities.has(id)) {
       throw new EntityAlreadyExistsError(collection, id);
     }
@@ -77,12 +77,12 @@ export class Storage implements IStorage {
     return entity;
   }
 
-  findById(collection: string, id: string): Entity | null {
+  findById(collection: string, id: string): Entry | null {
     const { entities } = this.getCollectionData(collection);
     return entities.get(id) ?? null;
   }
 
-  findByIdOrThrow(collection: string, id: string): Entity {
+  findByIdOrThrow(collection: string, id: string): Entry {
     const entity = this.findById(collection, id);
     if (entity === null) {
       throw new EntityNotFoundError(collection, id);
@@ -90,12 +90,12 @@ export class Storage implements IStorage {
     return entity;
   }
 
-  findAll(collection: string): Entity[] {
+  findAll(collection: string): Entry[] {
     const { entities } = this.getCollectionData(collection);
     return Array.from(entities.values());
   }
 
-  update<T extends Entity>(collection: string, id: string, data: T): T | null {
+  update<T extends Entry>(collection: string, id: string, data: T): T | null {
     const collectionData = this.getCollectionData(collection);
     this.validate(collection, data, collectionData);
     const existing = collectionData.entities.get(id);
@@ -106,7 +106,7 @@ export class Storage implements IStorage {
     return data;
   }
 
-  updateOrThrow<T extends Entity>(collection: string, id: string, data: T): T {
+  updateOrThrow<T extends Entry>(collection: string, id: string, data: T): T {
     const result = this.update(collection, id, data);
     if (result === null) {
       throw new EntityNotFoundError(collection, id);

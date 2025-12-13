@@ -1,13 +1,13 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { Storage, EntityAlreadyExistsError, EntityNotFoundError } from "../src/index.js";
-import type { Entity, EntityInput } from "../src/index.js";
+import type { Entry, EntryInput } from "../src/index.js";
 
-interface TestEntity extends Entity {
+interface TestEntity extends Entry {
   name: string;
   value: number;
 }
 
-interface TestEntityInput extends EntityInput {
+interface TestEntityInput extends EntryInput {
   name: string;
   value: number;
 }
@@ -50,7 +50,7 @@ describe("Storage - CRUD Operations", () => {
       storage.create("test", entity);
       expect(() => storage.create("test", entity)).toThrow(EntityAlreadyExistsError);
       expect(() => storage.create("test", entity)).toThrow(
-        "Entity with id 1 already exists in collection test"
+        "Entry with id 1 already exists in collection test"
       );
     });
   });
@@ -80,7 +80,7 @@ describe("Storage - CRUD Operations", () => {
     it("should throw EntityNotFoundError for non-existent id", () => {
       expect(() => storage.findByIdOrThrow("test", "999")).toThrow(EntityNotFoundError);
       expect(() => storage.findByIdOrThrow("test", "999")).toThrow(
-        "Entity with id 999 not found in collection test"
+        "Entry with id 999 not found in collection test"
       );
     });
   });
@@ -132,7 +132,7 @@ describe("Storage - CRUD Operations", () => {
       const updated: TestEntity = { id: "999", name: "updated", value: 42 };
       expect(() => storage.updateOrThrow("test", "999", updated)).toThrow(EntityNotFoundError);
       expect(() => storage.updateOrThrow("test", "999", updated)).toThrow(
-        "Entity with id 999 not found in collection test"
+        "Entry with id 999 not found in collection test"
       );
     });
   });

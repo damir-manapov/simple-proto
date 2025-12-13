@@ -34,7 +34,7 @@ export class EntityNotFoundError extends StorageError {
     public readonly collection: string,
     public readonly id: string
   ) {
-    super(`Entity with id ${id} not found in collection ${collection}`);
+    super(`Entry with id ${id} not found in collection ${collection}`);
     this.name = "EntityNotFoundError";
   }
 }
@@ -44,7 +44,7 @@ export class EntityAlreadyExistsError extends StorageError {
     public readonly collection: string,
     public readonly id: string
   ) {
-    super(`Entity with id ${id} already exists in collection ${collection}`);
+    super(`Entry with id ${id} already exists in collection ${collection}`);
     this.name = "EntityAlreadyExistsError";
   }
 }
