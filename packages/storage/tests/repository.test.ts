@@ -93,6 +93,90 @@ describe("Repository", () => {
       const all = userRepo.findAll();
       expect(all).toEqual([]);
     });
+
+    it("should filter by exact value", () => {
+      userRepo.create({ id: "user-1", name: "John", email: "john@example.com" });
+      userRepo.create({ id: "user-2", name: "Jane", email: "jane@example.com" });
+      const filtered = userRepo.findAll({ name: "John" });
+      expect(filtered).toHaveLength(1);
+      expect(filtered[0]?.name).toBe("John");
+    });
+
+    it("should filter with $eq operator", () => {
+      userRepo.create({ id: "user-1", name: "John", email: "john@example.com" });
+      userRepo.create({ id: "user-2", name: "Jane", email: "jane@example.com" });
+      const filtered = userRepo.findAll({ name: { $eq: "Jane" } });
+      expect(filtered).toHaveLength(1);
+      expect(filtered[0]?.name).toBe("Jane");
+    });
+
+    it("should filter with $ne operator", () => {
+      userRepo.create({ id: "user-1", name: "John", email: "john@example.com" });
+      userRepo.create({ id: "user-2", name: "Jane", email: "jane@example.com" });
+      const filtered = userRepo.findAll({ name: { $ne: "John" } });
+      expect(filtered).toHaveLength(1);
+      expect(filtered[0]?.name).toBe("Jane");
+    });
+
+    it("should filter with $in operator", () => {
+      userRepo.create({ id: "user-1", name: "John", email: "john@example.com" });
+      userRepo.create({ id: "user-2", name: "Jane", email: "jane@example.com" });
+      userRepo.create({ id: "user-3", name: "Jack", email: "jack@example.com" });
+      const filtered = userRepo.findAll({ name: { $in: ["John", "Jack"] } });
+      expect(filtered).toHaveLength(2);
+      expect(filtered.map((u) => u.name)).toEqual(["John", "Jack"]);
+    });
+
+    it("should filter with $nin operator", () => {
+      userRepo.create({ id: "user-1", name: "John", email: "john@example.com" });
+      userRepo.create({ id: "user-2", name: "Jane", email: "jane@example.com" });
+      userRepo.create({ id: "user-3", name: "Jack", email: "jack@example.com" });
+      const filtered = userRepo.findAll({ name: { $nin: ["John", "Jack"] } });
+      expect(filtered).toHaveLength(1);
+      expect(filtered[0]?.name).toBe("Jane");
+    });
+
+    it("should filter with $contains operator", () => {
+      userRepo.create({ id: "user-1", name: "John", email: "john@example.com" });
+      userRepo.create({ id: "user-2", name: "Jane", email: "jane@example.com" });
+      const filtered = userRepo.findAll({ name: { $contains: "an" } });
+      expect(filtered).toHaveLength(1);
+      expect(filtered[0]?.name).toBe("Jane");
+    });
+
+    it("should filter with $startsWith operator", () => {
+      userRepo.create({ id: "user-1", name: "John", email: "john@example.com" });
+      userRepo.create({ id: "user-2", name: "Jane", email: "jane@example.com" });
+      userRepo.create({ id: "user-3", name: "Jack", email: "jack@example.com" });
+      const filtered = userRepo.findAll({ name: { $startsWith: "Ja" } });
+      expect(filtered).toHaveLength(2);
+      expect(filtered.map((u) => u.name)).toEqual(["Jane", "Jack"]);
+    });
+
+    it("should filter with $endsWith operator", () => {
+      userRepo.create({ id: "user-1", name: "John", email: "john@example.com" });
+      userRepo.create({ id: "user-2", name: "Jane", email: "jane@example.com" });
+      const filtered = userRepo.findAll({ email: { $endsWith: "@example.com" } });
+      expect(filtered).toHaveLength(2);
+    });
+
+    it("should combine multiple filter conditions (AND)", () => {
+      userRepo.create({ id: "user-1", name: "John", email: "john@example.com" });
+      userRepo.create({ id: "user-2", name: "Jane", email: "jane@test.com" });
+      userRepo.create({ id: "user-3", name: "Jane", email: "jane@example.com" });
+      const filtered = userRepo.findAll({
+        name: "Jane",
+        email: { $endsWith: "@example.com" },
+      });
+      expect(filtered).toHaveLength(1);
+      expect(filtered[0]?.id).toBe("user-3");
+    });
+
+    it("should return empty array when filter matches nothing", () => {
+      userRepo.create({ id: "user-1", name: "John", email: "john@example.com" });
+      const filtered = userRepo.findAll({ name: "Nobody" });
+      expect(filtered).toEqual([]);
+    });
   });
 
   describe("update", () => {

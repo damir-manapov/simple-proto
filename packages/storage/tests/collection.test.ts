@@ -90,6 +90,76 @@ describe("Storage - Collection Management", () => {
     });
   });
 
+  describe("getCollectionRelations", () => {
+    it("should return empty object for schema without relations", () => {
+      storage.registerCollection({ name: "test", schema: testEntitySchema });
+      expect(storage.getCollectionRelations("test")).toEqual({});
+    });
+
+    it("should extract x-link-to from schema properties", () => {
+      const schemaWithRelation = {
+        type: "object",
+        properties: {
+          id: { type: "string", nullable: true },
+          title: { type: "string" },
+          authorId: { type: "string", "x-link-to": "users" },
+        },
+        required: ["title", "authorId"],
+        additionalProperties: false,
+      };
+      storage.registerCollection({ name: "posts", schema: schemaWithRelation });
+      expect(storage.getCollectionRelations("posts")).toEqual({ authorId: "users" });
+    });
+
+    it("should extract x-link-to from array items", () => {
+      const schemaWithArrayRelation = {
+        type: "object",
+        properties: {
+          id: { type: "string", nullable: true },
+          title: { type: "string" },
+          tagIds: {
+            type: "array",
+            items: { type: "string", "x-link-to": "tags" },
+          },
+        },
+        required: ["title"],
+        additionalProperties: false,
+      };
+      storage.registerCollection({ name: "articles", schema: schemaWithArrayRelation });
+      expect(storage.getCollectionRelations("articles")).toEqual({ tagIds: "tags" });
+    });
+
+    it("should extract multiple relations", () => {
+      const schemaWithMultipleRelations = {
+        type: "object",
+        properties: {
+          id: { type: "string", nullable: true },
+          title: { type: "string" },
+          authorId: { type: "string", "x-link-to": "users" },
+          categoryId: { type: "string", "x-link-to": "categories" },
+          tagIds: {
+            type: "array",
+            items: { type: "string", "x-link-to": "tags" },
+          },
+        },
+        required: ["title", "authorId"],
+        additionalProperties: false,
+      };
+      storage.registerCollection({ name: "posts", schema: schemaWithMultipleRelations });
+      expect(storage.getCollectionRelations("posts")).toEqual({
+        authorId: "users",
+        categoryId: "categories",
+        tagIds: "tags",
+      });
+    });
+
+    it("should throw EntityCollectionNotFoundError for unregistered collection", () => {
+      expect(() => storage.getCollectionRelations("unknown")).toThrow(
+        EntityCollectionNotFoundError
+      );
+    });
+  });
+
   describe("unregistered collection errors", () => {
     it("should throw EntityCollectionNotFoundError for create on unregistered collection", () => {
       expect(() => storage.create("unknown", { id: "1", name: "test", value: 42 })).toThrow(

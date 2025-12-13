@@ -3,7 +3,11 @@ export type {
   Entry,
   EntryInput,
   CollectionConfig,
+  CollectionRelations,
   Schema,
+  Filter,
+  FilterCondition,
+  FilterOperator,
   IRepository,
   IStorage,
 } from "./types.js";

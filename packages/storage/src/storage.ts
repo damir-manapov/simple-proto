@@ -8,10 +8,13 @@ import {
   EntryNotFoundError,
   ValidationError,
 } from "./errors.js";
+import { matchesFilter } from "./filter/index.js";
 import type {
   CollectionConfig,
+  CollectionRelations,
   Entry,
   EntryInput,
+  Filter,
   IRepository,
   IStorage,
   Schema,
@@ -48,8 +51,9 @@ class Repository<
     return this.storage.findByIdOrThrow(this.collectionName, id) as T;
   }
 
-  findAll(): T[] {
-    return this.storage.findAll(this.collectionName) as T[];
+  findAll(filter?: Filter<T>): T[] {
+    const all = this.storage.findAll(this.collectionName) as T[];
+    return filter ? all.filter((entry) => matchesFilter(entry, filter)) : all;
   }
 
   update(id: string, data: T): T | null {
@@ -71,7 +75,7 @@ class Repository<
 
 export class Storage implements IStorage {
   private readonly collections = new Map<string, CollectionData>();
-  private readonly ajv = new Ajv();
+  private readonly ajv = new Ajv({ strict: "log", keywords: ["x-link-to"] });
 
   registerCollection(config: CollectionConfig): void {
     if (this.collections.has(config.name)) {
@@ -96,6 +100,41 @@ export class Storage implements IStorage {
   getCollectionSchema(name: string): Schema {
     const data = this.getCollectionData(name);
     return data.config.schema;
+  }
+
+  getCollectionRelations(name: string): CollectionRelations {
+    const data = this.getCollectionData(name);
+    const schema = data.config.schema as Record<string, unknown> | null;
+    const relations: CollectionRelations = {};
+
+    if (!schema || typeof schema !== "object") {
+      return relations;
+    }
+
+    const properties = schema["properties"] as Record<string, Record<string, unknown>> | undefined;
+    if (!properties || typeof properties !== "object") {
+      return relations;
+    }
+
+    for (const [fieldName, fieldSchema] of Object.entries(properties)) {
+      // Check direct x-link-to on field
+      const linkTo = fieldSchema["x-link-to"];
+      if (typeof linkTo === "string") {
+        relations[fieldName] = linkTo;
+        continue;
+      }
+
+      // Check x-link-to on array items
+      const items = fieldSchema["items"] as Record<string, unknown> | undefined;
+      if (items && typeof items === "object") {
+        const itemsLinkTo = items["x-link-to"];
+        if (typeof itemsLinkTo === "string") {
+          relations[fieldName] = itemsLinkTo;
+        }
+      }
+    }
+
+    return relations;
   }
 
   getRepository<T extends Entry = Entry, TInput extends EntryInput = EntryInput>(
