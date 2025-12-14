@@ -131,6 +131,12 @@ importers:
       '@simple-proto/messaging-types':
         specifier: workspace:*
         version: link:../messaging-types
+      '@simple-proto/reports':
+        specifier: workspace:*
+        version: link:../reports
+      '@simple-proto/reports-types':
+        specifier: workspace:*
+        version: link:../reports-types
       '@simple-proto/storage-memory':
         specifier: workspace:*
         version: link:../storage-memory

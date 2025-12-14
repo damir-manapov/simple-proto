@@ -20,6 +20,8 @@
     "@simple-proto/marketing-campaigns-types": "workspace:*",
     "@simple-proto/messaging": "workspace:^",
     "@simple-proto/messaging-types": "workspace:*",
+    "@simple-proto/reports": "workspace:*",
+    "@simple-proto/reports-types": "workspace:*",
     "@simple-proto/storage-memory": "workspace:*",
     "@simple-proto/storage-types": "workspace:*",
     "reflect-metadata": "^0.2.2",
