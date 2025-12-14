@@ -1,10 +1,12 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import {
   Storage,
+} from "../src/index.js";
+import {
   EntityCollectionAlreadyExistsError,
   EntityCollectionNotFoundError,
-} from "../src/index.js";
-import type { Schema } from "../src/index.js";
+} from "@simple-proto/storage-types";
+import type { Schema } from "@simple-proto/storage-types";
 
 const testEntitySchema: Schema = {
   type: "object",

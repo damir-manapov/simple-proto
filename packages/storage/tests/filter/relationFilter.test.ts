@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { Storage } from "../../src/index.js";
-import type { Entry, EntryInput } from "../../src/index.js";
+import type { Entry, EntryInput } from "@simple-proto/storage-types";
 
 interface User extends Entry {
   name: string;

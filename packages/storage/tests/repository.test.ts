@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { Storage, EntryNotFoundError, EntryAlreadyExistsError } from "../src/index.js";
-import type { Entry, EntryInput, IRepository, Schema } from "../src/index.js";
+import { Storage } from "../src/index.js";
+import { EntryNotFoundError, EntryAlreadyExistsError } from "@simple-proto/storage-types";
+import type { Entry, EntryInput, IRepository, Schema } from "@simple-proto/storage-types";
 
 interface User extends Entry {
   name: string;

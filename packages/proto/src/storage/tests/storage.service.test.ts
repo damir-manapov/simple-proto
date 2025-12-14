@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { StorageService } from "../storage.service.js";
 import { Storage } from "@simple-proto/storage";
-import type { Schema } from "@simple-proto/storage";
+import type { Schema } from "@simple-proto/storage-types";
 
 const anySchema: Schema = { type: "object", additionalProperties: true };
 

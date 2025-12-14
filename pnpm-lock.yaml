@@ -47,10 +47,13 @@ importers:
 
   packages/messaging:
     dependencies:
+      '@simple-proto/storage-types':
+        specifier: workspace:*
+        version: link:../storage-types
+    devDependencies:
       '@simple-proto/storage':
         specifier: workspace:*
         version: link:../storage
-    devDependencies:
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -78,6 +81,9 @@ importers:
       '@simple-proto/storage':
         specifier: workspace:*
         version: link:../storage
+      '@simple-proto/storage-types':
+        specifier: workspace:*
+        version: link:../storage-types
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2

@@ -1,4 +1,4 @@
-import type { Entry, EntryInput } from "@simple-proto/storage";
+import type { Entry, EntryInput } from "@simple-proto/storage-types";
 
 /** Message template entity stored in the database */
 export interface MessageTemplate extends Entry {

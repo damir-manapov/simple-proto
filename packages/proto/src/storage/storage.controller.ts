@@ -10,7 +10,7 @@ import {
   BadRequestException,
 } from "@nestjs/common";
 import { StorageService } from "./storage.service.js";
-import type { AggregateRow, Entry } from "@simple-proto/storage";
+import type { AggregateRow, Entry } from "@simple-proto/storage-types";
 
 interface CreateDto {
   collection: string;

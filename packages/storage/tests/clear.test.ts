@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { Storage } from "../src/index.js";
-import type { Schema } from "../src/index.js";
+import type { Schema } from "@simple-proto/storage-types";
 
 const anySchema: Schema = { type: "object", additionalProperties: true };
 

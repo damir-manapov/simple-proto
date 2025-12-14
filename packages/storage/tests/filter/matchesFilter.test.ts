@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { matchesFilter } from "../../src/filter/index.js";
-import type { Entry } from "../../src/index.js";
+import type { Entry } from "@simple-proto/storage-types";
 
 interface TestEntry extends Entry {
   name: string;

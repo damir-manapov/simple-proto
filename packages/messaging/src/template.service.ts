@@ -1,4 +1,4 @@
-import type { IStorage, IRepository } from "@simple-proto/storage";
+import type { IStorage, IRepository } from "@simple-proto/storage-types";
 import type { MessageTemplate, MessageTemplateInput, RenderedMessage } from "./types.js";
 
 const DEFAULT_COLLECTION_NAME = "message_templates";
