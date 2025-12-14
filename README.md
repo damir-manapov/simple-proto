@@ -2,6 +2,10 @@
 
 Simple prototype of the system using pnpm monorepo.
 
+# ToDo
+
+* Simulate errors and postponed status update for messaging transport
+
 ## Prerequisites
 
 - Node.js >= 20
