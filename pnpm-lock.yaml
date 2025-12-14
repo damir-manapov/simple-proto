@@ -72,6 +72,9 @@ importers:
       '@simple-proto/calc':
         specifier: workspace:*
         version: link:../calc
+      '@simple-proto/messaging':
+        specifier: workspace:^
+        version: link:../messaging
       '@simple-proto/storage':
         specifier: workspace:*
         version: link:../storage
