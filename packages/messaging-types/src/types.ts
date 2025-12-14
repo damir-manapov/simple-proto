@@ -53,3 +53,23 @@ export interface SendResult {
   error?: string;
   rendered: RenderedMessage;
 }
+
+/** Data for a sent message (without id) */
+export interface SentMessageData {
+  /** ID of the template used */
+  templateId: string;
+  /** Recipient (email, phone, device token, url) */
+  recipient: string;
+  /** Rendered subject */
+  subject: string;
+  /** Rendered body */
+  body: string;
+  /** Timestamp when the message was sent */
+  sentAt: Date;
+}
+
+/** A sent message entity stored in the database */
+export interface SentMessage extends Entry, SentMessageData {}
+
+/** Input for creating a sent message */
+export interface SentMessageInput extends EntryInput, SentMessageData {}
