@@ -18,6 +18,7 @@ export type {
   NumberOperator,
   StringOperator,
   DateOperator,
+  RelationOperator,
 } from "./filter.js";
 
 // Aggregate types
