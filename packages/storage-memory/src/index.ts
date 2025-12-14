@@ -1,1 +1,1 @@
-export { MemoryStorage } from "./storage.js";
+export { MemoryStorage } from "./memory-storage.js";
