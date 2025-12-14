@@ -15,10 +15,13 @@ In-memory storage with collection-based entity management and JSON Schema valida
 - Add hooks with previous value
 - Add subscriptions between modules
 - Add reuse of storage repositories
+- Validation of overriten entity
 - Create custom meta with convertion to JSON schema
 - Add reports
 - Polimirfic fields
 - Nested filters on polimorfic fields
+- Modules own entities
+- Ability to add additional information to foreign entities
 
 ## Installation
 

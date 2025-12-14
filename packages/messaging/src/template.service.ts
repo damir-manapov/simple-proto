@@ -1,7 +1,7 @@
 import type { IStorage, IRepository } from "@simple-proto/storage";
 import type { MessageTemplate, MessageTemplateInput, RenderedMessage } from "./types.js";
 
-const COLLECTION_NAME = "message_templates";
+const DEFAULT_COLLECTION_NAME = "message_templates";
 
 const TEMPLATE_SCHEMA = {
   type: "object",
@@ -16,6 +16,11 @@ const TEMPLATE_SCHEMA = {
   required: ["name", "body", "type"],
 };
 
+export interface TemplateServiceOptions {
+  /** Collection name for storing templates. Defaults to "message_templates" */
+  collectionName?: string;
+}
+
 /**
  * Service for managing message templates.
  * Templates support variable interpolation using {{variableName}} syntax.
@@ -23,15 +28,17 @@ const TEMPLATE_SCHEMA = {
 export class TemplateService {
   private repo: IRepository<MessageTemplate, MessageTemplateInput>;
 
-  constructor(storage: IStorage) {
+  constructor(storage: IStorage, options: TemplateServiceOptions = {}) {
+    const collectionName = options.collectionName ?? DEFAULT_COLLECTION_NAME;
+
     // Register collection if not already registered
-    if (!storage.hasCollection(COLLECTION_NAME)) {
+    if (!storage.hasCollection(collectionName)) {
       storage.registerCollection({
-        name: COLLECTION_NAME,
+        name: collectionName,
         schema: TEMPLATE_SCHEMA,
       });
     }
-    this.repo = storage.getRepository<MessageTemplate, MessageTemplateInput>(COLLECTION_NAME);
+    this.repo = storage.getRepository<MessageTemplate, MessageTemplateInput>(collectionName);
   }
 
   /**
