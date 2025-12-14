@@ -41,9 +41,13 @@ pnpm install
 
 ```
 packages/
-  calc/       - Calculator utilities (add, subtract)
-  proto/      - NestJS application prototype
-  storage/    - In-memory storage with collection-based entity management
+  calc/                  - Calculator utilities (add, subtract)
+  storage-types/         - Storage type definitions and interfaces
+  storage-memory/        - In-memory storage implementation
+  messaging-types/       - Messaging type definitions
+  messaging/             - Message template service
+  marketing-campaigns/   - Marketing campaign management
+  proto/                 - NestJS application prototype
 ```
 
 ## Running the NestJS App
