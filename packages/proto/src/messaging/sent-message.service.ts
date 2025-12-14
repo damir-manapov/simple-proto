@@ -1,8 +1,5 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import type {
-  SentMessage,
-  MessageStatus,
-} from "@simple-proto/messaging-types";
+import type { SentMessage, MessageStatus } from "@simple-proto/messaging-types";
 import type { Entry, EntryInput, IRepository } from "@simple-proto/storage-types";
 import { StorageService } from "../storage/storage.service.js";
 import { MessagingService } from "./messaging.service.js";

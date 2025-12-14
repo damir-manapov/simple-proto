@@ -68,9 +68,7 @@ describe("TransportController (e2e)", () => {
         body: "Body 2",
       });
 
-      const response = await request(getServer())
-        .get("/messaging/transport/messages")
-        .expect(200);
+      const response = await request(getServer()).get("/messaging/transport/messages").expect(200);
 
       expect(Array.isArray(response.body)).toBe(true);
       expect((response.body as SentMessage[]).length).toBe(2);
@@ -79,14 +77,12 @@ describe("TransportController (e2e)", () => {
 
   describe("GET /messaging/transport/messages/:id", () => {
     it("should return a message by id", async () => {
-      const sendResponse = await request(getServer())
-        .post("/messaging/transport/send")
-        .send({
-          templateId: "template-1",
-          recipient: "user@example.com",
-          subject: "Hello",
-          body: "Body",
-        });
+      const sendResponse = await request(getServer()).post("/messaging/transport/send").send({
+        templateId: "template-1",
+        recipient: "user@example.com",
+        subject: "Hello",
+        body: "Body",
+      });
 
       const sentMessage = sendResponse.body as SentMessage;
 
@@ -99,9 +95,7 @@ describe("TransportController (e2e)", () => {
     });
 
     it("should return 404 for non-existent message", async () => {
-      await request(getServer())
-        .get("/messaging/transport/messages/non-existent-id")
-        .expect(404);
+      await request(getServer()).get("/messaging/transport/messages/non-existent-id").expect(404);
     });
   });
 
@@ -182,9 +176,7 @@ describe("TransportController (e2e)", () => {
 
       await request(getServer()).delete("/messaging/transport/messages").expect(200);
 
-      const response = await request(getServer())
-        .get("/messaging/transport/messages")
-        .expect(200);
+      const response = await request(getServer()).get("/messaging/transport/messages").expect(200);
 
       expect(response.body).toHaveLength(0);
     });

@@ -89,19 +89,15 @@ describe("SentMessageService (e2e)", () => {
   describe("GET /messaging/messages", () => {
     it("should return all sent messages", async () => {
       // Send two messages
-      await request(getServer())
-        .post("/messaging/send")
-        .send({
-          templateId: testTemplate.id,
-          recipient: "user1@example.com",
-        });
+      await request(getServer()).post("/messaging/send").send({
+        templateId: testTemplate.id,
+        recipient: "user1@example.com",
+      });
 
-      await request(getServer())
-        .post("/messaging/send")
-        .send({
-          templateId: testTemplate.id,
-          recipient: "user2@example.com",
-        });
+      await request(getServer()).post("/messaging/send").send({
+        templateId: testTemplate.id,
+        recipient: "user2@example.com",
+      });
 
       const response = await request(getServer()).get("/messaging/messages").expect(200);
 
@@ -112,12 +108,10 @@ describe("SentMessageService (e2e)", () => {
 
   describe("GET /messaging/messages/:id", () => {
     it("should return a sent message by id", async () => {
-      const sendResponse = await request(getServer())
-        .post("/messaging/send")
-        .send({
-          templateId: testTemplate.id,
-          recipient: "user@example.com",
-        });
+      const sendResponse = await request(getServer()).post("/messaging/send").send({
+        templateId: testTemplate.id,
+        recipient: "user@example.com",
+      });
 
       const sentMessage = sendResponse.body as SentMessage;
 
@@ -135,26 +129,20 @@ describe("SentMessageService (e2e)", () => {
 
   describe("GET /messaging/messages/by-recipient/:recipient", () => {
     it("should return messages by recipient", async () => {
-      await request(getServer())
-        .post("/messaging/send")
-        .send({
-          templateId: testTemplate.id,
-          recipient: "user1@example.com",
-        });
+      await request(getServer()).post("/messaging/send").send({
+        templateId: testTemplate.id,
+        recipient: "user1@example.com",
+      });
 
-      await request(getServer())
-        .post("/messaging/send")
-        .send({
-          templateId: testTemplate.id,
-          recipient: "user1@example.com",
-        });
+      await request(getServer()).post("/messaging/send").send({
+        templateId: testTemplate.id,
+        recipient: "user1@example.com",
+      });
 
-      await request(getServer())
-        .post("/messaging/send")
-        .send({
-          templateId: testTemplate.id,
-          recipient: "user2@example.com",
-        });
+      await request(getServer()).post("/messaging/send").send({
+        templateId: testTemplate.id,
+        recipient: "user2@example.com",
+      });
 
       const response = await request(getServer())
         .get("/messaging/messages/by-recipient/user1@example.com")
@@ -168,12 +156,10 @@ describe("SentMessageService (e2e)", () => {
 
   describe("GET /messaging/messages/by-status/:status", () => {
     it("should return messages by status", async () => {
-      await request(getServer())
-        .post("/messaging/send")
-        .send({
-          templateId: testTemplate.id,
-          recipient: "user@example.com",
-        });
+      await request(getServer()).post("/messaging/send").send({
+        templateId: testTemplate.id,
+        recipient: "user@example.com",
+      });
 
       const response = await request(getServer())
         .get("/messaging/messages/by-status/sent")
@@ -187,12 +173,10 @@ describe("SentMessageService (e2e)", () => {
 
   describe("PUT /messaging/messages/:id/status", () => {
     it("should update message status", async () => {
-      const sendResponse = await request(getServer())
-        .post("/messaging/send")
-        .send({
-          templateId: testTemplate.id,
-          recipient: "user@example.com",
-        });
+      const sendResponse = await request(getServer()).post("/messaging/send").send({
+        templateId: testTemplate.id,
+        recipient: "user@example.com",
+      });
 
       const sentMessage = sendResponse.body as SentMessage;
 
@@ -206,12 +190,10 @@ describe("SentMessageService (e2e)", () => {
     });
 
     it("should update message status with error", async () => {
-      const sendResponse = await request(getServer())
-        .post("/messaging/send")
-        .send({
-          templateId: testTemplate.id,
-          recipient: "user@example.com",
-        });
+      const sendResponse = await request(getServer()).post("/messaging/send").send({
+        templateId: testTemplate.id,
+        recipient: "user@example.com",
+      });
 
       const sentMessage = sendResponse.body as SentMessage;
 
@@ -227,12 +209,10 @@ describe("SentMessageService (e2e)", () => {
 
   describe("DELETE /messaging/messages", () => {
     it("should clear all sent messages", async () => {
-      await request(getServer())
-        .post("/messaging/send")
-        .send({
-          templateId: testTemplate.id,
-          recipient: "user@example.com",
-        });
+      await request(getServer()).post("/messaging/send").send({
+        templateId: testTemplate.id,
+        recipient: "user@example.com",
+      });
 
       await request(getServer()).delete("/messaging/messages").expect(200);
 
