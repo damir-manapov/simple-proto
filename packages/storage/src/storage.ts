@@ -9,6 +9,8 @@ import {
   ValidationError,
 } from "./errors.js";
 import { isOperator, isRelationOperator, matchesOperator } from "./filter/index.js";
+import { computeAggregate } from "./aggregate/index.js";
+import type { AggregateOptions, AggregateRow } from "./aggregate/index.js";
 import type {
   CollectionConfig,
   CollectionRelations,
@@ -56,6 +58,30 @@ class Repository<
     if (!filter) return all;
 
     return all.filter((entry) => this.matchesFilterWithRelations(entry, filter));
+  }
+
+  /**
+   * Aggregate entities with optional grouping, aggregation functions, and having clause.
+   * Returns an array of rows when groupBy is provided, or a single row otherwise.
+   *
+   * @example
+   * // Count all users
+   * repo.aggregate({ select: { _count: true } })
+   *
+   * @example
+   * // Group by country and compute average age
+   * repo.aggregate({
+   *   groupBy: ["country"],
+   *   select: { country: true, _count: true, age: { avg: true, max: true } },
+   *   having: { _count: { gt: 5 } }
+   * })
+   */
+  aggregate(options: AggregateOptions<T> & { groupBy: (keyof T)[] }): AggregateRow[];
+  aggregate(options: AggregateOptions<T>): AggregateRow;
+  aggregate(options: AggregateOptions<T>): AggregateRow | AggregateRow[] {
+    // Apply pre-filter if present
+    const entities = options.filter ? this.findAll(options.filter) : this.findAll();
+    return computeAggregate(entities, options);
   }
 
   private matchesFilterWithRelations(entry: T, filter: Filter<T>): boolean {

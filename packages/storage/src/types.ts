@@ -12,6 +12,7 @@ export type {
 } from "./filter/types.js";
 
 import type { Filter } from "./filter/types.js";
+import type { AggregateOptions, AggregateRow } from "./aggregate/types.js";
 
 export interface Entry {
   id: string;
@@ -38,6 +39,8 @@ export interface IRepository<T extends Entry = Entry, TInput extends EntryInput 
   updateOrThrow(id: string, data: T): T;
   delete(id: string): boolean;
   clear(): void;
+  aggregate(options: AggregateOptions<T> & { groupBy: (keyof T)[] }): AggregateRow[];
+  aggregate(options: AggregateOptions<T>): AggregateRow;
 }
 
 export interface IStorage {

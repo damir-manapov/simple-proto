@@ -16,6 +16,14 @@ export type {
   IStorage,
 } from "./types.js";
 export type { JSONSchemaType } from "ajv";
+export type {
+  AggregateFunction,
+  AggregateFieldSelect,
+  AggregateSelect,
+  AggregateHaving,
+  AggregateOptions,
+  AggregateRow,
+} from "./aggregate/index.js";
 export {
   StorageError,
   EntityCollectionNotFoundError,

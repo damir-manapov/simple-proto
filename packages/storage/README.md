@@ -7,8 +7,8 @@ In-memory storage with collection-based entity management and JSON Schema valida
 - Filter validation
 - Discrovery if sertain field of certain entity used somewhere in filter
 - String/number id, autogen/manual
-- Add special columns: _notDeleteable, _hidden, _createdBy, _updateBy, _createdAt, _updateAt
-- Forbid creating fields starting by "_"
+- Add special columns: \_notDeleteable, \_hidden, \_createdBy, \_updateBy, \_createdAt, \_updateAt
+- Forbid creating fields starting by "\_"
 - Validate field names
 - Add metadata manipulation
 - Add hooks
@@ -155,16 +155,17 @@ Interface for storage implementations:
 
 Interface for typed repository operations on a specific collection:
 
-| Method                    | Returns     | Description                                |
-| ------------------------- | ----------- | ------------------------------------------ |
-| `create(data)`            | `T`         | Create entry, auto-generates id if missing |
-| `findById(id)`            | `T \| null` | Find by id, returns null if not found      |
-| `findByIdOrThrow(id)`     | `T`         | Find by id, throws if not found            |
-| `findAll()`               | `T[]`       | Get all entries in collection              |
-| `update(id, data)`        | `T \| null` | Update entry, returns null if not found    |
-| `updateOrThrow(id, data)` | `T`         | Update entry, throws if not found          |
-| `delete(id)`              | `boolean`   | Delete entry, returns success status       |
-| `clear()`                 | `void`      | Clear all entries in collection            |
+| Method                    | Returns              | Description                                |
+| ------------------------- | -------------------- | ------------------------------------------ |
+| `create(data)`            | `T`                  | Create entry, auto-generates id if missing |
+| `findById(id)`            | `T \| null`          | Find by id, returns null if not found      |
+| `findByIdOrThrow(id)`     | `T`                  | Find by id, throws if not found            |
+| `findAll()`               | `T[]`                | Get all entries in collection              |
+| `update(id, data)`        | `T \| null`          | Update entry, returns null if not found    |
+| `updateOrThrow(id, data)` | `T`                  | Update entry, throws if not found          |
+| `delete(id)`              | `boolean`            | Delete entry, returns success status       |
+| `clear()`                 | `void`               | Clear all entries in collection            |
+| `aggregate(options)`      | `AggregateRow \| []` | Aggregate with groupBy, sum/avg/min/max    |
 
 #### Repository Usage
 
@@ -192,6 +193,93 @@ const all = userRepo.findAll(); // User[]
 userRepo.update(user.id, { ...user, name: "Johnny" });
 userRepo.delete(user.id);
 ```
+
+### Aggregation
+
+Repositories support powerful aggregation queries with optional grouping, aggregation functions, and post-aggregation filtering.
+
+#### Basic Count
+
+```typescript
+// Count all users
+const result = userRepo.aggregate({
+  select: { _count: true },
+});
+// Returns: { _count: 42 }
+```
+
+#### Aggregation Functions
+
+Supported functions: `sum`, `avg`, `min`, `max`
+
+```typescript
+// Compute aggregations on entire collection
+const result = userRepo.aggregate({
+  select: {
+    _count: true,
+    age: { avg: true, min: true, max: true },
+    score: { sum: true, avg: true },
+  },
+});
+// Returns: { _count: 3, age: { avg: 30, min: 20, max: 40 }, score: { sum: 270, avg: 90 } }
+```
+
+#### GroupBy
+
+When `groupBy` is provided, the result is an array of rows (one per group):
+
+```typescript
+// Group by country
+const results = userRepo.aggregate({
+  groupBy: ["country"],
+  select: {
+    country: true,
+    _count: true,
+    age: { avg: true },
+  },
+});
+// Returns: [
+//   { country: "US", _count: 10, age: { avg: 32 } },
+//   { country: "UK", _count: 5, age: { avg: 28 } }
+// ]
+```
+
+#### Pre-filter
+
+Apply a filter before aggregation:
+
+```typescript
+// Only aggregate US users
+const result = userRepo.aggregate({
+  filter: { country: { eq: "US" } },
+  select: { _count: true, age: { avg: true } },
+});
+```
+
+#### Having (Post-aggregation filter)
+
+Filter groups after aggregation using `having`:
+
+```typescript
+// Only return countries with more than 5 users
+const results = userRepo.aggregate({
+  groupBy: ["country"],
+  select: { country: true, _count: true },
+  having: { _count: { gt: 5 } },
+});
+
+// Filter by aggregated field value
+const results = userRepo.aggregate({
+  groupBy: ["country"],
+  select: { country: true, _count: true, age: { avg: true } },
+  having: { age: { avg: { gte: 30 } } },
+});
+```
+
+#### Return Type
+
+- **Without groupBy**: Returns a single `AggregateRow` object
+- **With groupBy**: Returns an `AggregateRow[]` array
 
 ## Errors
 
