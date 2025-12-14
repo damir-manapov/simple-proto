@@ -48,6 +48,8 @@ packages/
   messaging/                  - Message template service
   marketing-campaigns-types/  - Marketing campaign type definitions
   marketing-campaigns/        - Marketing campaign management
+  reports-types/              - Report type definitions
+  reports/                    - Report service (CRUD + execute)
   proto/                      - NestJS application prototype
 ```
 
