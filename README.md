@@ -4,7 +4,11 @@ Simple prototype of the system using pnpm monorepo.
 
 # ToDo
 
-* Simulate errors and postponed status update for messaging transport
+- Simulate errors and postponed status update for messaging transport
+- Add ability to postpone message sending
+- Add ability to postpone values resolvancy for messages
+- Move additional queries to views on storage level
+- Data workflows, that defines how to select data given conditions and existing data in collections. Examples: how to map profiles to emails, how to do mdm workflows
 
 ## Prerequisites
 

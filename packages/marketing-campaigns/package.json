@@ -1,0 +1,29 @@
+{
+  "name": "@simple-proto/marketing-campaigns",
+  "version": "0.0.1",
+  "author": "Damir Manapov",
+  "license": "MIT",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@simple-proto/messaging-types": "workspace:*",
+    "@simple-proto/storage-types": "workspace:*"
+  },
+  "devDependencies": {
+    "@simple-proto/storage-memory": "workspace:*",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.15"
+  }
+}
