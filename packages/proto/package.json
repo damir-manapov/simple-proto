@@ -17,6 +17,7 @@
     "@nestjs/platform-express": "^11.1.9",
     "@simple-proto/calc": "workspace:*",
     "@simple-proto/messaging": "workspace:^",
+    "@simple-proto/messaging-types": "workspace:*",
     "@simple-proto/storage-memory": "workspace:*",
     "@simple-proto/storage-types": "workspace:*",
     "reflect-metadata": "^0.2.2",

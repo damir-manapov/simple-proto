@@ -91,6 +91,9 @@ importers:
       '@simple-proto/messaging':
         specifier: workspace:^
         version: link:../messaging
+      '@simple-proto/messaging-types':
+        specifier: workspace:*
+        version: link:../messaging-types
       '@simple-proto/storage-memory':
         specifier: workspace:*
         version: link:../storage-memory

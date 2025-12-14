@@ -2,6 +2,7 @@ export type {
   MessageTemplate,
   MessageTemplateInput,
   MessageType,
+  MessageStatus,
   RenderedMessage,
   SendMessageOptions,
   SendResult,

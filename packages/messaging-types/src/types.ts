@@ -26,6 +26,9 @@ export interface MessageTemplateInput extends EntryInput {
 /** Supported message types */
 export type MessageType = "email" | "sms" | "push" | "webhook";
 
+/** Message delivery status */
+export type MessageStatus = "pending" | "sent" | "delivered" | "failed";
+
 /** Rendered message ready to send */
 export interface RenderedMessage {
   templateId: string;
@@ -64,8 +67,14 @@ export interface SentMessageData {
   subject: string;
   /** Rendered body */
   body: string;
+  /** Delivery status */
+  status: MessageStatus;
   /** Timestamp when the message was sent */
   sentAt: Date;
+  /** Timestamp when status was last updated */
+  updatedAt?: Date;
+  /** Error message if failed */
+  error?: string;
 }
 
 /** A sent message entity stored in the database */
