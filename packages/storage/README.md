@@ -17,6 +17,8 @@ In-memory storage with collection-based entity management and JSON Schema valida
 - Add reuse of storage repositories
 - Create custom meta with convertion to JSON schema
 - Add reports
+- Polimirfic fields
+- Nested filters on polimorfic fields
 
 ## Installation
 
