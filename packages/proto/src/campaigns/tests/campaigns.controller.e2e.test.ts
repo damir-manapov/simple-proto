@@ -7,7 +7,7 @@ import request from "supertest";
 import { CampaignsModule } from "../campaigns.module.js";
 import { StorageModule } from "../../storage/storage.module.js";
 import { MessagingModule } from "../../messaging/messaging.module.js";
-import type { Campaign, CampaignRunResult } from "@simple-proto/marketing-campaigns";
+import type { Campaign, CampaignRunResult } from "@simple-proto/marketing-campaigns-types";
 import type { MessageTemplate } from "@simple-proto/messaging-types";
 
 describe("CampaignsController (e2e)", () => {

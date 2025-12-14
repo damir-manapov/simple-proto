@@ -1,12 +1,12 @@
 import type { IStorage, IRepository, Entry } from "@simple-proto/storage-types";
-import type { SentMessage } from "@simple-proto/messaging-types";
 import type {
   Campaign,
   CampaignInput,
   CampaignStatus,
   CampaignRunResult,
   CampaignStats,
-} from "./types.js";
+  IMessageSender,
+} from "@simple-proto/marketing-campaigns-types";
 
 const DEFAULT_COLLECTION_NAME = "marketing_campaigns";
 
@@ -30,15 +30,6 @@ const CAMPAIGN_SCHEMA = {
 export interface CampaignServiceOptions {
   /** Collection name for storing campaigns. Defaults to "marketing_campaigns" */
   collectionName?: string;
-}
-
-/** Interface for message sender (to decouple from specific implementation) */
-export interface IMessageSender {
-  send(options: {
-    templateId: string;
-    recipient: string;
-    variables?: Record<string, string>;
-  }): SentMessage;
 }
 
 /**

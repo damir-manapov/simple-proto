@@ -47,6 +47,9 @@ importers:
 
   packages/marketing-campaigns:
     dependencies:
+      '@simple-proto/marketing-campaigns-types':
+        specifier: workspace:*
+        version: link:../marketing-campaigns-types
       '@simple-proto/messaging-types':
         specifier: workspace:*
         version: link:../messaging-types
@@ -63,6 +66,15 @@ importers:
       vitest:
         specifier: ^4.0.15
         version: 4.0.15(@types/node@25.0.2)(tsx@4.21.0)
+
+  packages/marketing-campaigns-types:
+    dependencies:
+      '@simple-proto/messaging-types':
+        specifier: workspace:*
+        version: link:../messaging-types
+      '@simple-proto/storage-types':
+        specifier: workspace:*
+        version: link:../storage-types
 
   packages/messaging:
     dependencies:
@@ -110,6 +122,9 @@ importers:
       '@simple-proto/marketing-campaigns':
         specifier: workspace:*
         version: link:../marketing-campaigns
+      '@simple-proto/marketing-campaigns-types':
+        specifier: workspace:*
+        version: link:../marketing-campaigns-types
       '@simple-proto/messaging':
         specifier: workspace:^
         version: link:../messaging

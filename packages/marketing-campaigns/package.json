@@ -18,6 +18,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@simple-proto/marketing-campaigns-types": "workspace:*",
     "@simple-proto/messaging-types": "workspace:*",
     "@simple-proto/storage-types": "workspace:*"
   },

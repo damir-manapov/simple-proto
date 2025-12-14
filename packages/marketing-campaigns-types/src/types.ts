@@ -1,4 +1,5 @@
 import type { Entry, EntryInput, Filter } from "@simple-proto/storage-types";
+import type { SentMessage } from "@simple-proto/messaging-types";
 
 /** Campaign status */
 export type CampaignStatus = "draft" | "active" | "paused" | "completed" | "failed";
@@ -68,4 +69,13 @@ export interface CampaignRunResult {
   success: boolean;
   stats: CampaignStats;
   errors?: string[];
+}
+
+/** Interface for message sender (to decouple from specific implementation) */
+export interface IMessageSender {
+  send(options: {
+    templateId: string;
+    recipient: string;
+    variables?: Record<string, string>;
+  }): SentMessage;
 }

@@ -2,8 +2,15 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { MemoryStorage } from "@simple-proto/storage-memory";
 import type { Entry, EntryInput, IRepository } from "@simple-proto/storage-types";
 import { CampaignService } from "../src/campaign.service.js";
-import type { IMessageSender } from "../src/campaign.service.js";
+import type { IMessageSender } from "@simple-proto/marketing-campaigns-types";
 import type { SentMessage } from "@simple-proto/messaging-types";
+
+/** Options passed to mock sender */
+interface MockSendOptions {
+  templateId: string;
+  recipient: string;
+  variables?: Record<string, string>;
+}
 
 interface User extends Entry {
   email?: string;
@@ -52,7 +59,7 @@ describe("CampaignService", () => {
     sentMessages = [];
 
     mockSender = {
-      send: (options): SentMessage => {
+      send: (options: MockSendOptions): SentMessage => {
         sentMessages.push(options);
         return {
           id: `msg-${String(sentMessages.length)}`,

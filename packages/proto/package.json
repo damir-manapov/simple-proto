@@ -17,6 +17,7 @@
     "@nestjs/platform-express": "^11.1.9",
     "@simple-proto/calc": "workspace:*",
     "@simple-proto/marketing-campaigns": "workspace:*",
+    "@simple-proto/marketing-campaigns-types": "workspace:*",
     "@simple-proto/messaging": "workspace:^",
     "@simple-proto/messaging-types": "workspace:*",
     "@simple-proto/storage-memory": "workspace:*",

@@ -1,10 +1,2 @@
 export { CampaignService } from "./campaign.service.js";
-export type { CampaignServiceOptions, IMessageSender } from "./campaign.service.js";
-export type {
-  Campaign,
-  CampaignInput,
-  CampaignStatus,
-  CampaignStats,
-  CampaignRunResult,
-  EntityConfig,
-} from "./types.js";
+export type { CampaignServiceOptions } from "./campaign.service.js";

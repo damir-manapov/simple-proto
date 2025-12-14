@@ -1,11 +1,12 @@
 import { Injectable } from "@nestjs/common";
-import { CampaignService, type IMessageSender } from "@simple-proto/marketing-campaigns";
+import { CampaignService } from "@simple-proto/marketing-campaigns";
 import type {
   Campaign,
   CampaignInput,
   CampaignStatus,
   CampaignRunResult,
-} from "@simple-proto/marketing-campaigns";
+  IMessageSender,
+} from "@simple-proto/marketing-campaigns-types";
 import { StorageService } from "../storage/storage.service.js";
 import { SentMessageService } from "../messaging/sent-message.service.js";
 

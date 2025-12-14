@@ -15,7 +15,7 @@ import type {
   CampaignInput,
   CampaignStatus,
   CampaignRunResult,
-} from "@simple-proto/marketing-campaigns";
+} from "@simple-proto/marketing-campaigns-types";
 
 @Controller("campaigns")
 export class CampaignsController {
