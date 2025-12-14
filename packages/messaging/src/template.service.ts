@@ -61,6 +61,17 @@ export class TemplateService {
   }
 
   /**
+   * Find a template by ID or throw if not found.
+   */
+  findByIdOrThrow(id: string): MessageTemplate {
+    const template = this.findById(id);
+    if (!template) {
+      throw new Error(`Template with id "${id}" not found`);
+    }
+    return template;
+  }
+
+  /**
    * Get all templates.
    */
   findAll(): MessageTemplate[] {
@@ -82,6 +93,17 @@ export class TemplateService {
   }
 
   /**
+   * Update a template or throw if not found.
+   */
+  updateOrThrow(id: string, data: MessageTemplate): MessageTemplate {
+    const updated = this.update(id, data);
+    if (!updated) {
+      throw new Error(`Template with id "${id}" not found`);
+    }
+    return updated;
+  }
+
+  /**
    * Delete a template.
    */
   delete(id: string): boolean {
@@ -93,10 +115,7 @@ export class TemplateService {
    * Replaces {{variableName}} with the corresponding value.
    */
   render(id: string, variables: Record<string, string> = {}): RenderedMessage {
-    const template = this.findById(id);
-    if (!template) {
-      throw new Error(`Template with id "${id}" not found`);
-    }
+    const template = this.findByIdOrThrow(id);
     return this.renderTemplate(template, variables);
   }
 
@@ -129,10 +148,7 @@ export class TemplateService {
    * Extract variable names from a template by ID.
    */
   extractVariables(id: string): string[] {
-    const template = this.findById(id);
-    if (!template) {
-      throw new Error(`Template with id "${id}" not found`);
-    }
+    const template = this.findByIdOrThrow(id);
     return this.extractFromTemplate(template);
   }
 
