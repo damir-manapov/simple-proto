@@ -1,12 +1,12 @@
 import { matchesOperator } from "../filter/filter.js";
-import type { Entry } from "../types.js";
+import type { Entry } from "@simple-proto/storage-types";
 import type {
   AggregateFunction,
   AggregateHaving,
   AggregateOptions,
   AggregateRow,
   AggregateSelect,
-} from "./types.js";
+} from "@simple-proto/storage-types";
 
 type GroupKey = string;
 

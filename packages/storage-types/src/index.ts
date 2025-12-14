@@ -1,12 +1,16 @@
-export { Storage } from "./storage.js";
-
-// Re-export all types from storage-types
+// Types and interfaces
 export type {
   Entry,
   EntryInput,
   CollectionConfig,
   CollectionRelations,
   Schema,
+  IRepository,
+  IStorage,
+} from "./types.js";
+
+// Filter types
+export type {
   Filter,
   FilterCondition,
   FilterOperatorFor,
@@ -14,16 +18,19 @@ export type {
   NumberOperator,
   StringOperator,
   DateOperator,
-  IRepository,
-  IStorage,
+} from "./filter.js";
+
+// Aggregate types
+export type {
   AggregateFunction,
   AggregateFieldSelect,
   AggregateSelect,
   AggregateHaving,
   AggregateOptions,
   AggregateRow,
-} from "@simple-proto/storage-types";
+} from "./aggregate.js";
 
+// Error classes
 export {
   StorageError,
   EntityCollectionNotFoundError,
@@ -31,4 +38,4 @@ export {
   ValidationError,
   EntryNotFoundError,
   EntryAlreadyExistsError,
-} from "@simple-proto/storage-types";
+} from "./errors.js";

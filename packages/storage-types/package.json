@@ -1,5 +1,5 @@
 {
-  "name": "@simple-proto/storage",
+  "name": "@simple-proto/storage-types",
   "version": "0.0.1",
   "author": "Damir Manapov",
   "license": "MIT",
@@ -13,16 +13,9 @@
     }
   },
   "scripts": {
-    "build": "tsc",
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "build": "tsc"
   },
   "devDependencies": {
-    "typescript": "^5.9.3",
-    "vitest": "^4.0.15"
-  },
-  "dependencies": {
-    "@simple-proto/storage-types": "workspace:*",
-    "ajv": "^8.17.1"
+    "typescript": "^5.9.3"
   }
 }

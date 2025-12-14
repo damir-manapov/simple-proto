@@ -4,14 +4,9 @@ import {
   EntityCollectionAlreadyExistsError,
   EntityCollectionNotFoundError,
 } from "../src/index.js";
-import type { EntryInput, JSONSchemaType, Schema } from "../src/index.js";
+import type { Schema } from "../src/index.js";
 
-interface TestEntityInput extends EntryInput {
-  name: string;
-  value: number;
-}
-
-const testEntitySchema: JSONSchemaType<TestEntityInput> = {
+const testEntitySchema: Schema = {
   type: "object",
   properties: {
     id: { type: "string", nullable: true },

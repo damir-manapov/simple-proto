@@ -1,0 +1,50 @@
+import type { Filter } from "./filter.js";
+import type { AggregateOptions, AggregateRow } from "./aggregate.js";
+
+export interface Schema {
+  type?: string;
+  properties?: Record<string, unknown>;
+  required?: string[];
+  [key: string]: unknown;
+}
+
+export interface Entry {
+  id: string;
+}
+
+export interface EntryInput {
+  id?: string;
+}
+
+export interface CollectionConfig {
+  name: string;
+  schema: Schema;
+}
+
+/** Map of field name to target collection name (extracted from x-link-to) */
+export type CollectionRelations = Record<string, string>;
+
+export interface IRepository<T extends Entry = Entry, TInput extends EntryInput = EntryInput> {
+  create(data: TInput): T;
+  findById(id: string): T | null;
+  findByIdOrThrow(id: string): T;
+  findAll(filter?: Filter<T>): T[];
+  update(id: string, data: T): T | null;
+  updateOrThrow(id: string, data: T): T;
+  delete(id: string): boolean;
+  clear(): void;
+  aggregate(options: AggregateOptions<T> & { groupBy: (keyof T)[] }): AggregateRow[];
+  aggregate(options: AggregateOptions<T>): AggregateRow;
+}
+
+export interface IStorage {
+  registerCollection(config: CollectionConfig): void;
+  hasCollection(name: string): boolean;
+  getCollections(): string[];
+  getCollectionSchema(name: string): Schema;
+  getCollectionRelations(name: string): CollectionRelations;
+  getRepository<T extends Entry = Entry, TInput extends EntryInput = EntryInput>(
+    collection: string
+  ): IRepository<T, TInput>;
+  clearAll(): void;
+}

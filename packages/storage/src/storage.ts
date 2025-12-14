@@ -7,10 +7,10 @@ import {
   EntryAlreadyExistsError,
   EntryNotFoundError,
   ValidationError,
-} from "./errors.js";
+} from "@simple-proto/storage-types";
 import { isOperator, isRelationOperator, matchesOperator } from "./filter/index.js";
 import { computeAggregate } from "./aggregate/index.js";
-import type { AggregateOptions, AggregateRow } from "./aggregate/index.js";
+import type { AggregateOptions, AggregateRow } from "@simple-proto/storage-types";
 import type {
   CollectionConfig,
   CollectionRelations,
@@ -20,7 +20,7 @@ import type {
   IRepository,
   IStorage,
   Schema,
-} from "./types.js";
+} from "@simple-proto/storage-types";
 
 // Handle CommonJS/ESM interop
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition

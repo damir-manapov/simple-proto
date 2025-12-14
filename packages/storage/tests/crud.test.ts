@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { Storage, EntryAlreadyExistsError, EntryNotFoundError } from "../src/index.js";
-import type { Entry, EntryInput, JSONSchemaType } from "../src/index.js";
+import type { Entry, EntryInput, Schema } from "../src/index.js";
 
 interface TestEntity extends Entry {
   name: string;
@@ -12,7 +12,7 @@ interface TestEntityInput extends EntryInput {
   value: number;
 }
 
-const testEntitySchema: JSONSchemaType<TestEntityInput> = {
+const testEntitySchema: Schema = {
   type: "object",
   properties: {
     id: { type: "string", nullable: true },
