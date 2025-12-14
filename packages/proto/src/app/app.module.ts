@@ -4,9 +4,10 @@ import { AppService } from "./app.service.js";
 import { CalcModule } from "../calc/calc.module.js";
 import { StorageModule } from "../storage/storage.module.js";
 import { MessagingModule } from "../messaging/messaging.module.js";
+import { MessagingTransportModule } from "../messaging-transport/messaging-transport.module.js";
 
 @Module({
-  imports: [StorageModule, CalcModule, MessagingModule],
+  imports: [StorageModule, CalcModule, MessagingModule, MessagingTransportModule],
   controllers: [AppController],
   providers: [AppService],
 })
