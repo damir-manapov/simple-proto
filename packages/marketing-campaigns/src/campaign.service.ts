@@ -138,6 +138,13 @@ export class CampaignService {
   }
 
   /**
+   * Clear all campaigns
+   */
+  clear(): void {
+    this.repo.clear();
+  }
+
+  /**
    * Get the value at a nested path from an object
    */
   private getValueAtPath(obj: Record<string, unknown>, path: string): unknown {

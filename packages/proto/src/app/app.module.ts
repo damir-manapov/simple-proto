@@ -5,9 +5,10 @@ import { CalcModule } from "../calc/calc.module.js";
 import { StorageModule } from "../storage/storage.module.js";
 import { MessagingModule } from "../messaging/messaging.module.js";
 import { MessagingTransportModule } from "../messaging-transport/messaging-transport.module.js";
+import { CampaignsModule } from "../campaigns/campaigns.module.js";
 
 @Module({
-  imports: [StorageModule, CalcModule, MessagingModule, MessagingTransportModule],
+  imports: [StorageModule, CalcModule, MessagingModule, MessagingTransportModule, CampaignsModule],
   controllers: [AppController],
   providers: [AppService],
 })

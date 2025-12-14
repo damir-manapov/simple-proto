@@ -107,6 +107,9 @@ importers:
       '@simple-proto/calc':
         specifier: workspace:*
         version: link:../calc
+      '@simple-proto/marketing-campaigns':
+        specifier: workspace:*
+        version: link:../marketing-campaigns
       '@simple-proto/messaging':
         specifier: workspace:^
         version: link:../messaging
