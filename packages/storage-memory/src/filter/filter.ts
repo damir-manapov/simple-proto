@@ -1,13 +1,13 @@
-import type { Entry } from "@simple-proto/storage-types";
 import type {
+  Entry,
   Filter,
   FilterCondition,
   AnyOperator,
   NumberOperator,
   StringOperator,
   DateOperator,
+  RelationOperator,
 } from "@simple-proto/storage-types";
-import type { RelationOperator } from "./types.js";
 
 // Runtime union of all operator types
 type AnyFilterOperator = AnyOperator<unknown> | NumberOperator | StringOperator | DateOperator;
