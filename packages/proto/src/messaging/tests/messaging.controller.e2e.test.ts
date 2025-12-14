@@ -55,21 +55,6 @@ describe("MessagingController (e2e)", () => {
       expect(Array.isArray(response.body)).toBe(true);
     });
 
-    it("GET /messaging/templates/by-name/:name - find by name", async () => {
-      // Create first
-      await request(getServer()).post("/messaging/templates").send({
-        name: "test-find",
-        body: "Test body",
-        type: "sms",
-      });
-
-      const response = await request(getServer())
-        .get("/messaging/templates/by-name/test-find")
-        .expect(200);
-
-      expect((response.body as { name: string }).name).toBe("test-find");
-    });
-
     it("GET /messaging/templates/by-type/:type - find by type", async () => {
       await request(getServer()).post("/messaging/templates").send({
         name: "push-notification",
@@ -165,10 +150,6 @@ describe("MessagingController (e2e)", () => {
   });
 
   describe("Error handling", () => {
-    it("returns 404 for non-existent template by name", async () => {
-      await request(getServer()).get("/messaging/templates/by-name/non-existent").expect(404);
-    });
-
     it("returns 404 for non-existent template by id", async () => {
       await request(getServer()).get("/messaging/templates/non-existent-id").expect(404);
     });

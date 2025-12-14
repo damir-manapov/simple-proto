@@ -46,8 +46,8 @@ export class TemplateService {
    */
   create(input: MessageTemplateInput): MessageTemplate {
     // Check for duplicate name
-    const existing = this.findByName(input.name);
-    if (existing) {
+    const existing = this.repo.findAll({ name: { eq: input.name } });
+    if (existing.length > 0) {
       throw new Error(`Template with name "${input.name}" already exists`);
     }
     return this.repo.create(input);
@@ -58,25 +58,6 @@ export class TemplateService {
    */
   findById(id: string): MessageTemplate | null {
     return this.repo.findById(id);
-  }
-
-  /**
-   * Find a template by name.
-   */
-  findByName(name: string): MessageTemplate | null {
-    const templates = this.repo.findAll({ name: { eq: name } });
-    return templates[0] ?? null;
-  }
-
-  /**
-   * Find a template by name or throw if not found.
-   */
-  findByNameOrThrow(name: string): MessageTemplate {
-    const template = this.findByName(name);
-    if (!template) {
-      throw new Error(`Template "${name}" not found`);
-    }
-    return template;
   }
 
   /**
@@ -108,18 +89,10 @@ export class TemplateService {
   }
 
   /**
-   * Render a template with the given variables.
+   * Render a template by ID with the given variables.
    * Replaces {{variableName}} with the corresponding value.
    */
-  render(templateName: string, variables: Record<string, string> = {}): RenderedMessage {
-    const template = this.findByNameOrThrow(templateName);
-    return this.renderTemplate(template, variables);
-  }
-
-  /**
-   * Render a template by ID with the given variables.
-   */
-  renderById(id: string, variables: Record<string, string> = {}): RenderedMessage {
+  render(id: string, variables: Record<string, string> = {}): RenderedMessage {
     const template = this.findById(id);
     if (!template) {
       throw new Error(`Template with id "${id}" not found`);
@@ -129,7 +102,7 @@ export class TemplateService {
 
   private renderTemplate(
     template: MessageTemplate,
-    variables: Record<string, string>,
+    variables: Record<string, string>
   ): RenderedMessage {
     const renderText = (text: string): string => {
       return text.replace(/\{\{(\w+)\}\}/g, (_, key: string) => {
@@ -153,17 +126,9 @@ export class TemplateService {
   }
 
   /**
-   * Extract variable names from a template body.
-   */
-  extractVariables(templateName: string): string[] {
-    const template = this.findByNameOrThrow(templateName);
-    return this.extractFromTemplate(template);
-  }
-
-  /**
    * Extract variable names from a template by ID.
    */
-  extractVariablesById(id: string): string[] {
+  extractVariables(id: string): string[] {
     const template = this.findById(id);
     if (!template) {
       throw new Error(`Template with id "${id}" not found`);

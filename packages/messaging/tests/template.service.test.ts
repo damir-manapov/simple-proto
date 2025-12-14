@@ -42,21 +42,21 @@ describe("TemplateService", () => {
     });
   });
 
-  describe("findByName", () => {
-    it("should find template by name", () => {
-      templateService.create({
+  describe("findById", () => {
+    it("should find template by id", () => {
+      const created = templateService.create({
         name: "reset-password",
         body: "Reset your password here: {{link}}",
         type: "email",
       });
 
-      const found = templateService.findByName("reset-password");
+      const found = templateService.findById(created.id);
       expect(found).not.toBeNull();
       expect(found?.name).toBe("reset-password");
     });
 
-    it("should return null for non-existent name", () => {
-      const found = templateService.findByName("non-existent");
+    it("should return null for non-existent id", () => {
+      const found = templateService.findById("non-existent");
       expect(found).toBeNull();
     });
   });
@@ -77,14 +77,14 @@ describe("TemplateService", () => {
 
   describe("render", () => {
     it("should render template with variables", () => {
-      templateService.create({
+      const template = templateService.create({
         name: "welcome",
         subject: "Welcome to {{appName}}",
         body: "Hello {{name}}, welcome to {{appName}}!",
         type: "email",
       });
 
-      const rendered = templateService.render("welcome", {
+      const rendered = templateService.render(template.id, {
         name: "John",
         appName: "MyApp",
       });
@@ -95,33 +95,33 @@ describe("TemplateService", () => {
     });
 
     it("should keep unmatched variables as-is", () => {
-      templateService.create({
+      const template = templateService.create({
         name: "partial",
         body: "Hello {{name}}, your code is {{code}}",
         type: "sms",
       });
 
-      const rendered = templateService.render("partial", { name: "Jane" });
+      const rendered = templateService.render(template.id, { name: "Jane" });
       expect(rendered.body).toBe("Hello Jane, your code is {{code}}");
     });
 
     it("should throw for non-existent template", () => {
       expect(() => templateService.render("non-existent", {})).toThrow(
-        'Template "non-existent" not found'
+        'Template with id "non-existent" not found'
       );
     });
   });
 
   describe("extractVariables", () => {
     it("should extract variable names from template", () => {
-      templateService.create({
+      const template = templateService.create({
         name: "invoice",
         subject: "Invoice #{{invoiceNumber}}",
         body: "Dear {{customerName}}, your invoice for {{amount}} is ready.",
         type: "email",
       });
 
-      const vars = templateService.extractVariables("invoice");
+      const vars = templateService.extractVariables(template.id);
       expect(vars).toContain("invoiceNumber");
       expect(vars).toContain("customerName");
       expect(vars).toContain("amount");
@@ -129,13 +129,13 @@ describe("TemplateService", () => {
     });
 
     it("should return unique variables", () => {
-      templateService.create({
+      const template = templateService.create({
         name: "repeat",
         body: "{{name}} {{name}} {{name}}",
         type: "sms",
       });
 
-      const vars = templateService.extractVariables("repeat");
+      const vars = templateService.extractVariables(template.id);
       expect(vars).toEqual(["name"]);
     });
   });

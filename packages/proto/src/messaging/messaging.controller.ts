@@ -24,15 +24,6 @@ export class MessagingController {
     return this.messagingService.findAll();
   }
 
-  @Get("templates/by-name/:name")
-  findByName(@Param("name") name: string): MessageTemplate {
-    const template = this.messagingService.findByName(name);
-    if (!template) {
-      throw new NotFoundException(`Template "${name}" not found`);
-    }
-    return template;
-  }
-
   @Get("templates/by-type/:type")
   findByType(@Param("type") type: MessageTemplate["type"]): MessageTemplate[] {
     return this.messagingService.findByType(type);
@@ -67,11 +58,11 @@ export class MessagingController {
 
   @Post("templates/:id/render")
   render(@Param("id") id: string, @Body() body: RenderDto): RenderedMessage {
-    return this.messagingService.renderById(id, body.variables ?? {});
+    return this.messagingService.render(id, body.variables ?? {});
   }
 
   @Get("templates/:id/variables")
   extractVariables(@Param("id") id: string): { variables: string[] } {
-    return { variables: this.messagingService.extractVariablesById(id) };
+    return { variables: this.messagingService.extractVariables(id) };
   }
 }
