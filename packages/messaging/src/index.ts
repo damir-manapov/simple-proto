@@ -7,4 +7,4 @@ export type {
   RenderedMessage,
   SendMessageOptions,
   SendResult,
-} from "./types.js";
+} from "@simple-proto/messaging-types";
