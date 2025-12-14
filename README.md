@@ -2,10 +2,6 @@
 
 Simple prototype of the system using pnpm monorepo.
 
-## ToDo
-
-- Filter validation
-
 ## Prerequisites
 
 - Node.js >= 20

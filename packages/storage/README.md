@@ -2,6 +2,18 @@
 
 In-memory storage with collection-based entity management and JSON Schema validation.
 
+## ToDo
+
+- Filter validation
+- Discrovery if sertain field of certain entity used somewhere in filter
+- String/number id, autogen/manual
+- Add special columns: _notDeleteable, _hidden, _createdBy, _updateBy, _createdAt, _updateAt
+- Forbid creating fields starting by "_"
+- Validate field names
+- Add metadata manipulation
+- Add hooks
+- Add hooks with previous value
+
 ## Installation
 
 ```bash
