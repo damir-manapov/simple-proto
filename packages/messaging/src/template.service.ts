@@ -113,7 +113,24 @@ export class TemplateService {
    */
   render(templateName: string, variables: Record<string, string> = {}): RenderedMessage {
     const template = this.findByNameOrThrow(templateName);
+    return this.renderTemplate(template, variables);
+  }
 
+  /**
+   * Render a template by ID with the given variables.
+   */
+  renderById(id: string, variables: Record<string, string> = {}): RenderedMessage {
+    const template = this.findById(id);
+    if (!template) {
+      throw new Error(`Template with id "${id}" not found`);
+    }
+    return this.renderTemplate(template, variables);
+  }
+
+  private renderTemplate(
+    template: MessageTemplate,
+    variables: Record<string, string>,
+  ): RenderedMessage {
     const renderText = (text: string): string => {
       return text.replace(/\{\{(\w+)\}\}/g, (_, key: string) => {
         return variables[key] ?? `{{${key}}}`;
@@ -140,6 +157,21 @@ export class TemplateService {
    */
   extractVariables(templateName: string): string[] {
     const template = this.findByNameOrThrow(templateName);
+    return this.extractFromTemplate(template);
+  }
+
+  /**
+   * Extract variable names from a template by ID.
+   */
+  extractVariablesById(id: string): string[] {
+    const template = this.findById(id);
+    if (!template) {
+      throw new Error(`Template with id "${id}" not found`);
+    }
+    return this.extractFromTemplate(template);
+  }
+
+  private extractFromTemplate(template: MessageTemplate): string[] {
     const allText = `${template.subject ?? ""} ${template.body}`;
     const matches = allText.matchAll(/\{\{(\w+)\}\}/g);
     const variables = new Set<string>();

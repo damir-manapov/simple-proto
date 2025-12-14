@@ -123,16 +123,17 @@ describe("MessagingController (e2e)", () => {
   });
 
   describe("Rendering", () => {
-    it("POST /messaging/templates/by-name/:name/render - render template with variables", async () => {
-      await request(getServer()).post("/messaging/templates").send({
+    it("POST /messaging/templates/:id/render - render template with variables", async () => {
+      const createResponse = await request(getServer()).post("/messaging/templates").send({
         name: "render-test",
         subject: "Hello {{name}}",
         body: "Welcome to {{appName}}, {{name}}!",
         type: "email",
       });
+      const { id } = createResponse.body as { id: string };
 
       const response = await request(getServer())
-        .post("/messaging/templates/by-name/render-test/render")
+        .post(`/messaging/templates/${id}/render`)
         .send({
           variables: { name: "John", appName: "MyApp" },
         })
@@ -143,16 +144,17 @@ describe("MessagingController (e2e)", () => {
       expect(body.body).toBe("Welcome to MyApp, John!");
     });
 
-    it("GET /messaging/templates/by-name/:name/variables - extract variables", async () => {
-      await request(getServer()).post("/messaging/templates").send({
+    it("GET /messaging/templates/:id/variables - extract variables", async () => {
+      const createResponse = await request(getServer()).post("/messaging/templates").send({
         name: "vars-test",
         subject: "Order #{{orderId}}",
         body: "Dear {{customerName}}, your total is {{amount}}",
         type: "email",
       });
+      const { id } = createResponse.body as { id: string };
 
       const response = await request(getServer())
-        .get("/messaging/templates/by-name/vars-test/variables")
+        .get(`/messaging/templates/${id}/variables`)
         .expect(200);
 
       const vars = (response.body as { variables: string[] }).variables;

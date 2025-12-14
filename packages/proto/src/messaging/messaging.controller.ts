@@ -65,13 +65,13 @@ export class MessagingController {
     return { success: true };
   }
 
-  @Post("templates/by-name/:name/render")
-  render(@Param("name") name: string, @Body() body: RenderDto): RenderedMessage {
-    return this.messagingService.render(name, body.variables ?? {});
+  @Post("templates/:id/render")
+  render(@Param("id") id: string, @Body() body: RenderDto): RenderedMessage {
+    return this.messagingService.renderById(id, body.variables ?? {});
   }
 
-  @Get("templates/by-name/:name/variables")
-  extractVariables(@Param("name") name: string): { variables: string[] } {
-    return { variables: this.messagingService.extractVariables(name) };
+  @Get("templates/:id/variables")
+  extractVariables(@Param("id") id: string): { variables: string[] } {
+    return { variables: this.messagingService.extractVariablesById(id) };
   }
 }
