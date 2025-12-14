@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { Storage } from "../src/index.js";
+import { MemoryStorage } from "../src/index.js";
 import { EntryAlreadyExistsError, EntryNotFoundError } from "@simple-proto/storage-types";
 import type { Entry, EntryInput, Schema } from "@simple-proto/storage-types";
 
@@ -25,10 +25,10 @@ const testEntitySchema: Schema = {
 };
 
 describe("Storage - CRUD Operations", () => {
-  let storage: Storage;
+  let storage: MemoryStorage;
 
   beforeEach(() => {
-    storage = new Storage();
+    storage = new MemoryStorage();
     storage.registerCollection({ name: "test", schema: testEntitySchema });
   });
 

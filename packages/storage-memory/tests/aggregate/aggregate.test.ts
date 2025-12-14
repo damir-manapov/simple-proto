@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { Storage } from "../../src/index.js";
+import { MemoryStorage } from "../../src/index.js";
 import type { Entry, EntryInput } from "@simple-proto/storage-types";
 
 interface User extends Entry {
@@ -17,10 +17,10 @@ interface UserInput extends EntryInput {
 }
 
 describe("Aggregate", () => {
-  let storage: Storage;
+  let storage: MemoryStorage;
 
   beforeEach(() => {
-    storage = new Storage();
+    storage = new MemoryStorage();
 
     storage.registerCollection({
       name: "users",

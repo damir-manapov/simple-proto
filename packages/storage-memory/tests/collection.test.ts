@@ -1,7 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import {
-  Storage,
-} from "../src/index.js";
+import { MemoryStorage } from "../src/index.js";
 import {
   EntityCollectionAlreadyExistsError,
   EntityCollectionNotFoundError,
@@ -22,10 +20,10 @@ const testEntitySchema: Schema = {
 const anySchema: Schema = { type: "object", additionalProperties: true };
 
 describe("Storage - Collection Management", () => {
-  let storage: Storage;
+  let storage: MemoryStorage;
 
   beforeEach(() => {
-    storage = new Storage();
+    storage = new MemoryStorage();
   });
 
   describe("registerCollection", () => {

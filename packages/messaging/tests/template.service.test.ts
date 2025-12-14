@@ -1,13 +1,13 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { Storage } from "@simple-proto/storage";
+import { MemoryStorage } from "@simple-proto/storage-memory";
 import { TemplateService } from "../src/index.js";
 
 describe("TemplateService", () => {
-  let storage: Storage;
+  let storage: MemoryStorage;
   let templateService: TemplateService;
 
   beforeEach(() => {
-    storage = new Storage();
+    storage = new MemoryStorage();
     templateService = new TemplateService(storage);
   });
 

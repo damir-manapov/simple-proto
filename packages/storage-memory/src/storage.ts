@@ -38,7 +38,7 @@ class Repository<
 > implements IRepository<T, TInput> {
   constructor(
     private readonly collectionName: string,
-    private readonly storage: Storage
+    private readonly storage: MemoryStorage
   ) {}
 
   create(data: TInput): T {
@@ -245,7 +245,7 @@ class Repository<
   }
 }
 
-export class Storage implements IStorage {
+export class MemoryStorage implements IStorage {
   private readonly collections = new Map<string, CollectionData>();
   private readonly ajv = new Ajv({ strict: "log", keywords: ["x-link-to"] });
 

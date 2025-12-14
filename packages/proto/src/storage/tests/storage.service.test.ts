@@ -1,17 +1,17 @@
 import { describe, it, expect } from "vitest";
 import { StorageService } from "../storage.service.js";
-import { Storage } from "@simple-proto/storage";
+import { MemoryStorage } from "@simple-proto/storage-memory";
 import type { Schema } from "@simple-proto/storage-types";
 
 const anySchema: Schema = { type: "object", additionalProperties: true };
 
 describe("StorageService", () => {
-  it("should be an instance of Storage", () => {
+  it("should be an instance of MemoryStorage", () => {
     const service = new StorageService();
-    expect(service).toBeInstanceOf(Storage);
+    expect(service).toBeInstanceOf(MemoryStorage);
   });
 
-  it("should have all Storage methods", () => {
+  it("should have all MemoryStorage methods", () => {
     const service = new StorageService();
     expect(typeof service.registerCollection).toBe("function");
     expect(typeof service.hasCollection).toBe("function");

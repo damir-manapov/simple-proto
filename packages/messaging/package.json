@@ -21,7 +21,7 @@
     "@simple-proto/storage-types": "workspace:*"
   },
   "devDependencies": {
-    "@simple-proto/storage": "workspace:*",
+    "@simple-proto/storage-memory": "workspace:*",
     "typescript": "^5.9.3",
     "vitest": "^4.0.15"
   }

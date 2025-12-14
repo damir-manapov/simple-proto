@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { Storage } from "../src/index.js";
+import { MemoryStorage } from "../src/index.js";
 import { EntryNotFoundError, EntryAlreadyExistsError } from "@simple-proto/storage-types";
 import type { Entry, EntryInput, IRepository, Schema } from "@simple-proto/storage-types";
 
@@ -25,11 +25,11 @@ const userSchema: Schema = {
 };
 
 describe("Repository", () => {
-  let storage: Storage;
+  let storage: MemoryStorage;
   let userRepo: IRepository<User, UserInput>;
 
   beforeEach(() => {
-    storage = new Storage();
+    storage = new MemoryStorage();
     storage.registerCollection({ name: "users", schema: userSchema });
     userRepo = storage.getRepository<User, UserInput>("users");
   });
