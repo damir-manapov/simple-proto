@@ -7,7 +7,6 @@ import type {
 } from "./messaging.service.js";
 
 interface RenderDto {
-  template: string;
   variables?: Record<string, string>;
 }
 
@@ -66,12 +65,12 @@ export class MessagingController {
     return { success: true };
   }
 
-  @Post("render")
-  render(@Body() body: RenderDto): RenderedMessage {
-    return this.messagingService.render(body.template, body.variables ?? {});
+  @Post("templates/by-name/:name/render")
+  render(@Param("name") name: string, @Body() body: RenderDto): RenderedMessage {
+    return this.messagingService.render(name, body.variables ?? {});
   }
 
-  @Get("templates/:name/variables")
+  @Get("templates/by-name/:name/variables")
   extractVariables(@Param("name") name: string): { variables: string[] } {
     return { variables: this.messagingService.extractVariables(name) };
   }
