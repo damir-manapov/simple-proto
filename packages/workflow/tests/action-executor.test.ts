@@ -1,5 +1,10 @@
 import { describe, it, expect, beforeEach, vi, type Mock } from "vitest";
-import { ActionExecutor, type MessageHandler, type HttpClient, type Logger } from "../src/action-executor.js";
+import {
+  ActionExecutor,
+  type MessageHandler,
+  type HttpClient,
+  type Logger,
+} from "../src/action-executor.js";
 import { MemoryStorage } from "@simple-proto/storage-memory";
 import type { Entry } from "@simple-proto/storage-types";
 import type {
@@ -56,12 +61,7 @@ describe("ActionExecutor", () => {
       const result = await executor.execute(action, context);
 
       expect(result.success).toBe(true);
-      expect(sendMock).toHaveBeenCalledWith(
-        "email",
-        "john@example.com",
-        "Hello!",
-        "welcome"
-      );
+      expect(sendMock).toHaveBeenCalledWith("email", "john@example.com", "Hello!", "welcome");
     });
   });
 

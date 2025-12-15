@@ -10,23 +10,13 @@ import type {
   LogAction,
 } from "@simple-proto/workflow-types";
 import type { IStorage, EntryInput } from "@simple-proto/storage-types";
-import {
-  resolveValue,
-  resolveRecord,
-  setNestedValue,
-  toSafeString,
-} from "./utils.js";
+import { resolveValue, resolveRecord, setNestedValue, toSafeString } from "./utils.js";
 
 /**
  * Message handler interface for SendMessageAction
  */
 export interface MessageHandler {
-  send(
-    channel: string,
-    recipient: unknown,
-    message: unknown,
-    template?: string
-  ): Promise<void>;
+  send(channel: string, recipient: unknown, message: unknown, template?: string): Promise<void>;
 }
 
 /**

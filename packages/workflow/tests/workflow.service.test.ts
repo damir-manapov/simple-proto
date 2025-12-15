@@ -136,7 +136,7 @@ describe("WorkflowService", () => {
 
     it("should throw for non-existent workflow", async () => {
       await expect(service.startExecution("nonexistent", {})).rejects.toThrow(
-        "Workflow nonexistent not found",
+        "Workflow nonexistent not found"
       );
     });
 
@@ -190,8 +190,18 @@ describe("WorkflowService", () => {
         status: "active",
         steps: [
           conditionStep,
-          { id: "pass", type: "action", action: { type: "log", message: "passed" }, next: "end" } as ActionStep,
-          { id: "fail", type: "action", action: { type: "log", message: "failed" }, next: "end" } as ActionStep,
+          {
+            id: "pass",
+            type: "action",
+            action: { type: "log", message: "passed" },
+            next: "end",
+          } as ActionStep,
+          {
+            id: "fail",
+            type: "action",
+            action: { type: "log", message: "failed" },
+            next: "end",
+          } as ActionStep,
           { id: "end", type: "end" },
         ],
       });
@@ -223,8 +233,18 @@ describe("WorkflowService", () => {
         status: "active",
         steps: [
           conditionStep,
-          { id: "pass", type: "action", action: { type: "log", message: "passed" }, next: "end" } as ActionStep,
-          { id: "fail", type: "action", action: { type: "log", message: "failed" }, next: "end" } as ActionStep,
+          {
+            id: "pass",
+            type: "action",
+            action: { type: "log", message: "passed" },
+            next: "end",
+          } as ActionStep,
+          {
+            id: "fail",
+            type: "action",
+            action: { type: "log", message: "failed" },
+            next: "end",
+          } as ActionStep,
           { id: "end", type: "end" },
         ],
       });
@@ -256,8 +276,18 @@ describe("WorkflowService", () => {
         status: "active",
         steps: [
           conditionStep,
-          { id: "adult", type: "action", action: { type: "log", message: "adult" }, next: "end" } as ActionStep,
-          { id: "minor", type: "action", action: { type: "log", message: "minor" }, next: "end" } as ActionStep,
+          {
+            id: "adult",
+            type: "action",
+            action: { type: "log", message: "adult" },
+            next: "end",
+          } as ActionStep,
+          {
+            id: "minor",
+            type: "action",
+            action: { type: "log", message: "minor" },
+            next: "end",
+          } as ActionStep,
           { id: "end", type: "end" },
         ],
       });
@@ -418,13 +448,13 @@ describe("WorkflowService", () => {
       expect(execution.status).toBe("completed");
 
       await expect(service.resumeExecution(execution.id, {})).rejects.toThrow(
-        "Cannot resume execution with status completed",
+        "Cannot resume execution with status completed"
       );
     });
 
     it("should throw when resuming non-existent execution", async () => {
       await expect(service.resumeExecution("nonexistent", {})).rejects.toThrow(
-        "Execution nonexistent not found",
+        "Execution nonexistent not found"
       );
     });
   });
@@ -456,8 +486,18 @@ describe("WorkflowService", () => {
         status: "active",
         steps: [
           conditionStep,
-          { id: "found", type: "action", action: { type: "log", message: "found" }, next: "end" } as ActionStep,
-          { id: "notFound", type: "action", action: { type: "log", message: "not found" }, next: "end" } as ActionStep,
+          {
+            id: "found",
+            type: "action",
+            action: { type: "log", message: "found" },
+            next: "end",
+          } as ActionStep,
+          {
+            id: "notFound",
+            type: "action",
+            action: { type: "log", message: "not found" },
+            next: "end",
+          } as ActionStep,
           { id: "end", type: "end" },
         ],
       });
@@ -496,8 +536,18 @@ describe("WorkflowService", () => {
         status: "active",
         steps: [
           conditionStep,
-          { id: "found", type: "action", action: { type: "log", message: "found" }, next: "end" } as ActionStep,
-          { id: "notFound", type: "action", action: { type: "log", message: "not found" }, next: "end" } as ActionStep,
+          {
+            id: "found",
+            type: "action",
+            action: { type: "log", message: "found" },
+            next: "end",
+          } as ActionStep,
+          {
+            id: "notFound",
+            type: "action",
+            action: { type: "log", message: "not found" },
+            next: "end",
+          } as ActionStep,
           { id: "end", type: "end" },
         ],
       });
@@ -718,7 +768,7 @@ describe("WorkflowService", () => {
         "email",
         "customer@example.com",
         "Order created!",
-        undefined,
+        undefined
       );
 
       const ordersRepo = storage.getRepository<OrderEntry>("orders");

@@ -8,6 +8,7 @@ import { MessagingTransportModule } from "../messaging-transport/messaging-trans
 import { CampaignsModule } from "../campaigns/campaigns.module.js";
 import { ReportsModule } from "../reports/reports.module.js";
 import { MdmModule } from "../mdm/mdm.module.js";
+import { WorkflowModule } from "../workflow/workflow.module.js";
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { MdmModule } from "../mdm/mdm.module.js";
     CampaignsModule,
     ReportsModule,
     MdmModule,
+    WorkflowModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -171,6 +171,12 @@ importers:
       '@simple-proto/storage-types':
         specifier: workspace:*
         version: link:../storage-types
+      '@simple-proto/workflow':
+        specifier: workspace:*
+        version: link:../workflow
+      '@simple-proto/workflow-types':
+        specifier: workspace:*
+        version: link:../workflow-types
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2

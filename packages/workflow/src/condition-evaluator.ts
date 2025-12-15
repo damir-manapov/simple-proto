@@ -86,10 +86,7 @@ export class ConditionEvaluator {
     return comparator(leftNum, rightNum);
   }
 
-  private evaluateExists(
-    condition: ExistsCondition,
-    context: Record<string, unknown>
-  ): boolean {
+  private evaluateExists(condition: ExistsCondition, context: Record<string, unknown>): boolean {
     if (!this.storage.hasCollection(condition.collection)) {
       return false;
     }

@@ -25,6 +25,8 @@
     "@simple-proto/reports": "workspace:*",
     "@simple-proto/reports-types": "workspace:*",
     "@simple-proto/storage-memory": "workspace:*",
+    "@simple-proto/workflow": "workspace:*",
+    "@simple-proto/workflow-types": "workspace:*",
     "@simple-proto/storage-types": "workspace:*",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
