@@ -45,6 +45,31 @@ importers:
         specifier: ^4.0.15
         version: 4.0.15(@types/node@25.0.2)(tsx@4.21.0)
 
+  packages/discounts:
+    dependencies:
+      '@simple-proto/discounts-types':
+        specifier: workspace:*
+        version: link:../discounts-types
+      '@simple-proto/storage-types':
+        specifier: workspace:*
+        version: link:../storage-types
+    devDependencies:
+      '@simple-proto/storage-memory':
+        specifier: workspace:*
+        version: link:../storage-memory
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^4.0.15
+        version: 4.0.15(@types/node@25.0.2)(tsx@4.21.0)
+
+  packages/discounts-types:
+    devDependencies:
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
   packages/marketing-campaigns:
     dependencies:
       '@simple-proto/marketing-campaigns-types':
@@ -141,6 +166,12 @@ importers:
       '@simple-proto/calc':
         specifier: workspace:*
         version: link:../calc
+      '@simple-proto/discounts':
+        specifier: workspace:*
+        version: link:../discounts
+      '@simple-proto/discounts-types':
+        specifier: workspace:*
+        version: link:../discounts-types
       '@simple-proto/marketing-campaigns':
         specifier: workspace:*
         version: link:../marketing-campaigns

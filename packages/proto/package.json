@@ -16,6 +16,8 @@
     "@nestjs/core": "^11.1.9",
     "@nestjs/platform-express": "^11.1.9",
     "@simple-proto/calc": "workspace:*",
+    "@simple-proto/discounts": "workspace:*",
+    "@simple-proto/discounts-types": "workspace:*",
     "@simple-proto/marketing-campaigns": "workspace:*",
     "@simple-proto/marketing-campaigns-types": "workspace:*",
     "@simple-proto/mdm": "workspace:*",

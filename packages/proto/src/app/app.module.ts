@@ -9,6 +9,7 @@ import { CampaignsModule } from "../campaigns/campaigns.module.js";
 import { ReportsModule } from "../reports/reports.module.js";
 import { MdmModule } from "../mdm/mdm.module.js";
 import { WorkflowModule } from "../workflow/workflow.module.js";
+import { DiscountsModule } from "../discounts/discounts.module.js";
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { WorkflowModule } from "../workflow/workflow.module.js";
     ReportsModule,
     MdmModule,
     WorkflowModule,
+    DiscountsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
