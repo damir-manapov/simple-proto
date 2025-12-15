@@ -7,6 +7,7 @@ import { MessagingModule } from "../messaging/messaging.module.js";
 import { MessagingTransportModule } from "../messaging-transport/messaging-transport.module.js";
 import { CampaignsModule } from "../campaigns/campaigns.module.js";
 import { ReportsModule } from "../reports/reports.module.js";
+import { MdmModule } from "../mdm/mdm.module.js";
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ReportsModule } from "../reports/reports.module.js";
     MessagingTransportModule,
     CampaignsModule,
     ReportsModule,
+    MdmModule,
   ],
   controllers: [AppController],
   providers: [AppService],

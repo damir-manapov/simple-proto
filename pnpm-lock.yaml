@@ -147,6 +147,12 @@ importers:
       '@simple-proto/marketing-campaigns-types':
         specifier: workspace:*
         version: link:../marketing-campaigns-types
+      '@simple-proto/mdm':
+        specifier: workspace:*
+        version: link:../mdm
+      '@simple-proto/mdm-types':
+        specifier: workspace:*
+        version: link:../mdm-types
       '@simple-proto/messaging':
         specifier: workspace:^
         version: link:../messaging

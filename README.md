@@ -9,6 +9,7 @@ Simple prototype of the system using pnpm monorepo.
 - Add ability to postpone values resolvancy for messages
 - Move additional queries to views on storage level
 - Data workflows, that defines how to select data given conditions and existing data in collections. Examples: how to map profiles to emails, how to do mdm workflows
+- Why do we need createMockRepository and createMockStorage?
 
 ## Prerequisites
 
