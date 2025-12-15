@@ -7,7 +7,12 @@ import request from "supertest";
 import { DiscountsModule } from "../discounts.module.js";
 import { StorageModule } from "../../storage/storage.module.js";
 import { StorageService } from "../../storage/storage.service.js";
-import type { Discount, DiscountResult } from "@simple-proto/discounts-types";
+import type {
+  Discount,
+  DiscountResult,
+  GeneratedCode,
+  CodeValidationResult,
+} from "@simple-proto/discounts-types";
 
 describe("Discounts Controllers (e2e)", () => {
   let app: INestApplication;
@@ -34,6 +39,31 @@ describe("Discounts Controllers (e2e)", () => {
   beforeEach(() => {
     storageService.clearAll();
   });
+
+  // Helper function for creating a discount in code-related tests
+  const createDiscount = async (params: {
+    name: string;
+    type: "percentage" | "fixed";
+    value: number;
+    isActive: boolean;
+  }): Promise<Discount> => {
+    const response = await request(getServer())
+      .post("/discounts")
+      .send({
+        name: params.name,
+        target: { type: "cart" },
+        value:
+          params.type === "percentage"
+            ? { type: "percentage", percentage: params.value }
+            : { type: "fixedAmount", amount: params.value },
+        conditions: [],
+        priority: 1,
+        stacking: "all",
+        status: params.isActive ? "active" : "inactive",
+      })
+      .expect(201);
+    return response.body as Discount;
+  };
 
   describe("DiscountsController", () => {
     describe("POST /discounts", () => {
@@ -368,6 +398,246 @@ describe("Discounts Controllers (e2e)", () => {
 
       it("should return 400 if parameters missing", async () => {
         await request(getServer()).get("/discount-usages/count").expect(400);
+      });
+    });
+  });
+
+  describe("CodesController", () => {
+    describe("POST /discount-codes", () => {
+      it("should generate codes for a discount", async () => {
+        const discount = await createDiscount({
+          name: "Promo Code Discount",
+          type: "percentage",
+          value: 20,
+          isActive: true,
+        });
+
+        const response = await request(getServer())
+          .post("/discount-codes")
+          .send({
+            discountId: discount.id,
+            count: 5,
+            options: {
+              pattern: "alphanumeric",
+              length: 8,
+              prefix: "PROMO-",
+              uppercase: true,
+            },
+          })
+          .expect(201);
+
+        const body = response.body as { codes: GeneratedCode[] };
+        expect(body.codes).toHaveLength(5);
+        const firstCode = body.codes[0];
+        expect(firstCode).toBeDefined();
+        expect(firstCode?.code).toMatch(/^PROMO-[A-Z0-9]{8}$/);
+        expect(firstCode?.discountId).toBe(discount.id);
+      });
+
+      it("should return 400 if discount not found", async () => {
+        await request(getServer())
+          .post("/discount-codes")
+          .send({
+            discountId: "non-existent-id",
+            count: 5,
+          })
+          .expect(400);
+      });
+    });
+
+    describe("GET /discount-codes/:code", () => {
+      it("should get a generated code", async () => {
+        const discount = await createDiscount({
+          name: "Get Code Test",
+          type: "percentage",
+          value: 10,
+          isActive: true,
+        });
+
+        const generateResponse = await request(getServer())
+          .post("/discount-codes")
+          .send({
+            discountId: discount.id,
+            count: 1,
+            options: { pattern: "alphanumeric", length: 8 },
+          })
+          .expect(201);
+
+        const generated = generateResponse.body as { codes: GeneratedCode[] };
+        const firstGenerated = generated.codes[0];
+        expect(firstGenerated).toBeDefined();
+        const codeValue = firstGenerated?.code ?? "";
+
+        const response = await request(getServer())
+          .get(`/discount-codes/${codeValue}`)
+          .expect(200);
+
+        const codeResult = response.body as GeneratedCode;
+        expect(codeResult.code).toBe(codeValue);
+        expect(codeResult.discountId).toBe(discount.id);
+      });
+
+      it("should return 404 if code not found", async () => {
+        await request(getServer())
+          .get("/discount-codes/INVALID-CODE")
+          .expect(404);
+      });
+    });
+
+    describe("GET /discount-codes", () => {
+      it("should list codes for a discount", async () => {
+        const discount = await createDiscount({
+          name: "List Codes Test",
+          type: "percentage",
+          value: 15,
+          isActive: true,
+        });
+
+        await request(getServer())
+          .post("/discount-codes")
+          .send({
+            discountId: discount.id,
+            count: 3,
+            options: { pattern: "numeric", length: 6 },
+          })
+          .expect(201);
+
+        const response = await request(getServer())
+          .get(`/discount-codes?discountId=${discount.id}`)
+          .expect(200);
+
+        const body = response.body as { codes: GeneratedCode[] };
+        expect(body.codes).toHaveLength(3);
+        const firstCode = body.codes[0];
+        expect(firstCode).toBeDefined();
+        expect(firstCode?.discountId).toBe(discount.id);
+      });
+
+      it("should return 400 if discountId not provided", async () => {
+        await request(getServer())
+          .get("/discount-codes")
+          .expect(400);
+      });
+    });
+
+    describe("POST /discount-codes/validate", () => {
+      it("should validate a valid code", async () => {
+        const discount = await createDiscount({
+          name: "Validate Code Test",
+          type: "percentage",
+          value: 25,
+          isActive: true,
+        });
+
+        const generateResponse = await request(getServer())
+          .post("/discount-codes")
+          .send({
+            discountId: discount.id,
+            count: 1,
+            options: { pattern: "alphanumeric", length: 10 },
+          })
+          .expect(201);
+
+        const generated = generateResponse.body as { codes: GeneratedCode[] };
+        const firstGenerated = generated.codes[0];
+        expect(firstGenerated).toBeDefined();
+        const codeValue = firstGenerated?.code ?? "";
+
+        const response = await request(getServer())
+          .post("/discount-codes/validate")
+          .send({ code: codeValue })
+          .expect(200);
+
+        const result = response.body as CodeValidationResult;
+        expect(result.valid).toBe(true);
+        expect(result.discount).toBeDefined();
+        expect(result.discount?.id).toBe(discount.id);
+      });
+
+      it("should return invalid for non-existent code", async () => {
+        const response = await request(getServer())
+          .post("/discount-codes/validate")
+          .send({ code: "INVALID-CODE-123" })
+          .expect(200);
+
+        const result = response.body as CodeValidationResult;
+        expect(result.valid).toBe(false);
+        expect(result.reason).toBe("Invalid code");
+      });
+    });
+
+    describe("POST /discount-codes/:code/redeem", () => {
+      it("should redeem a code", async () => {
+        const discount = await createDiscount({
+          name: "Redeem Code Test",
+          type: "fixed",
+          value: 10,
+          isActive: true,
+        });
+
+        const generateResponse = await request(getServer())
+          .post("/discount-codes")
+          .send({
+            discountId: discount.id,
+            count: 1,
+            options: { pattern: "alphanumeric", length: 8 },
+          })
+          .expect(201);
+
+        const generated = generateResponse.body as { codes: GeneratedCode[] };
+        const firstGenerated = generated.codes[0];
+        expect(firstGenerated).toBeDefined();
+        const codeValue = firstGenerated?.code ?? "";
+
+        const response = await request(getServer())
+          .post(`/discount-codes/${codeValue}/redeem`)
+          .send({ customerId: "customer-456" })
+          .expect(200);
+
+        const body = response.body as { success: boolean; code: GeneratedCode };
+        expect(body.success).toBe(true);
+        expect(body.code.usedBy).toBe("customer-456");
+        expect(body.code.usedAt).toBeDefined();
+      });
+
+      it("should not allow redeeming same code twice", async () => {
+        const discount = await createDiscount({
+          name: "Double Redeem Test",
+          type: "fixed",
+          value: 5,
+          isActive: true,
+        });
+
+        const generateResponse = await request(getServer())
+          .post("/discount-codes")
+          .send({
+            discountId: discount.id,
+            count: 1,
+            options: { pattern: "alphanumeric", length: 8 },
+          })
+          .expect(201);
+
+        const generated = generateResponse.body as { codes: GeneratedCode[] };
+        const firstGenerated = generated.codes[0];
+        expect(firstGenerated).toBeDefined();
+        const codeValue = firstGenerated?.code ?? "";
+
+        await request(getServer())
+          .post(`/discount-codes/${codeValue}/redeem`)
+          .send({ customerId: "customer-789" })
+          .expect(200);
+
+        await request(getServer())
+          .post(`/discount-codes/${codeValue}/redeem`)
+          .send({ customerId: "customer-other" })
+          .expect(400);
+      });
+
+      it("should return 404 for non-existent code", async () => {
+        await request(getServer())
+          .post("/discount-codes/FAKE-CODE/redeem")
+          .send({ customerId: "customer-123" })
+          .expect(404);
       });
     });
   });

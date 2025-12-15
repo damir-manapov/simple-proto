@@ -1,11 +1,11 @@
 import { Module } from "@nestjs/common";
-import { DiscountsController, UsageController } from "./discounts.controller.js";
+import { DiscountsController, UsageController, GeneratedCodesController } from "./discounts.controller.js";
 import { DiscountsService } from "./discounts.service.js";
 import { StorageModule } from "../storage/storage.module.js";
 
 @Module({
   imports: [StorageModule],
-  controllers: [DiscountsController, UsageController],
+  controllers: [DiscountsController, UsageController, GeneratedCodesController],
   providers: [DiscountsService],
   exports: [DiscountsService],
 })

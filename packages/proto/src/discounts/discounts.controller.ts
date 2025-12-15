@@ -9,6 +9,7 @@ import {
   Query,
   HttpException,
   HttpStatus,
+  HttpCode,
 } from "@nestjs/common";
 import type {
   Discount,
@@ -19,6 +20,10 @@ import type {
   StackingStrategy,
   DiscountUsage,
   DiscountUsageInput,
+  CodeGenerationOptions,
+  GeneratedCode,
+  CodeValidationInput,
+  CodeValidationResult,
 } from "@simple-proto/discounts-types";
 import { DiscountsService } from "./discounts.service.js";
 
@@ -92,6 +97,11 @@ export class DiscountsController {
     }
     return this.service.calculateDiscounts(body.context, options);
   }
+
+  @Post("validate")
+  validate(@Body() input: CodeValidationInput): CodeValidationResult {
+    return this.service.validateCode(input);
+  }
 }
 
 // ==================== Usage Controller ====================
@@ -115,5 +125,84 @@ export class UsageController {
     }
     const count = this.service.getCustomerUsageCount(discountId, customerId);
     return { count };
+  }
+}
+
+// ==================== Generated Codes Controller ====================
+
+@Controller("discount-codes")
+export class GeneratedCodesController {
+  constructor(private readonly service: DiscountsService) {}
+
+  @Post()
+  generate(
+    @Body()
+    body: { discountId: string; count: number; options?: CodeGenerationOptions },
+  ): { codes: GeneratedCode[] } {
+    try {
+      const codes = this.service.generateCodeBatch(
+        body.discountId,
+        body.count,
+        body.options ?? { pattern: "alphanumeric", length: 8 },
+      );
+      return { codes };
+    } catch (error) {
+      throw new HttpException(
+        error instanceof Error ? error.message : "Failed to generate codes",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  @Post("validate")
+  @HttpCode(200)
+  validate(@Body() body: CodeValidationInput): CodeValidationResult {
+    return this.service.validateCode(body);
+  }
+
+  @Get()
+  list(@Query("discountId") discountId: string): { codes: GeneratedCode[] } {
+    if (!discountId) {
+      throw new HttpException("discountId is required", HttpStatus.BAD_REQUEST);
+    }
+    const codes = this.service.getGeneratedCodesForDiscount(discountId);
+    return { codes };
+  }
+
+  @Get(":code")
+  get(@Param("code") code: string): GeneratedCode {
+    const generated = this.service.getGeneratedCode(code);
+    if (!generated) {
+      throw new HttpException("Code not found", HttpStatus.NOT_FOUND);
+    }
+    return generated;
+  }
+
+  @Post(":code/redeem")
+  @HttpCode(200)
+  redeem(
+    @Param("code") code: string,
+    @Body() body: { customerId: string; orderId?: string },
+  ): { success: boolean; code: GeneratedCode } {
+    const generated = this.service.getGeneratedCode(code);
+    if (!generated) {
+      throw new HttpException("Code not found", HttpStatus.NOT_FOUND);
+    }
+    try {
+      const redeemed = this.service.redeemCode(
+        code,
+        body.customerId,
+        body.orderId ?? `order-${String(Date.now())}`,
+      );
+      if (!redeemed) {
+        throw new HttpException("Code not found", HttpStatus.NOT_FOUND);
+      }
+      return { success: true, code: redeemed };
+    } catch (error) {
+      throw new HttpException(
+        error instanceof Error ? error.message : "Failed to redeem code",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 }

@@ -9,6 +9,10 @@ import type {
   StackingStrategy,
   DiscountUsage,
   DiscountUsageInput,
+  CodeGenerationOptions,
+  GeneratedCode,
+  CodeValidationInput,
+  CodeValidationResult,
 } from "@simple-proto/discounts-types";
 import { StorageService } from "../storage/storage.service.js";
 
@@ -72,5 +76,33 @@ export class DiscountsService {
 
   getCustomerUsageCount(discountId: string, customerId: string): number {
     return this.discountService.getCustomerUsage(discountId, customerId);
+  }
+
+  // ==================== Code Generation ====================
+
+  generateCode(discountId: string, options: CodeGenerationOptions): string {
+    return this.discountService.generateCode(discountId, options);
+  }
+
+  generateCodeBatch(discountId: string, count: number, options: CodeGenerationOptions): GeneratedCode[] {
+    return this.discountService.generateCodeBatch(discountId, count, options);
+  }
+
+  getGeneratedCode(code: string): GeneratedCode | null {
+    return this.discountService.getGeneratedCode(code);
+  }
+
+  getGeneratedCodesForDiscount(discountId: string): GeneratedCode[] {
+    return this.discountService.getGeneratedCodesForDiscount(discountId);
+  }
+
+  redeemCode(code: string, customerId: string, orderId: string): GeneratedCode | null {
+    return this.discountService.redeemGeneratedCode(code, customerId, orderId);
+  }
+
+  // ==================== Code Validation ====================
+
+  validateCode(input: CodeValidationInput): CodeValidationResult {
+    return this.discountService.validateCode(input);
   }
 }

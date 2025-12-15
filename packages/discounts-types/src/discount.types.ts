@@ -94,3 +94,77 @@ export interface DiscountUsageInput {
   orderId: string;
   amount: number;
 }
+
+// ==================== Promo Code Types ====================
+
+/**
+ * Code generation pattern
+ */
+export type CodePattern =
+  | "alphanumeric" // ABC123
+  | "alphabetic" // ABCDEF
+  | "numeric" // 123456
+  | "custom"; // User-defined pattern
+
+/**
+ * Options for generating promo codes
+ */
+export interface CodeGenerationOptions {
+  pattern: CodePattern;
+  length: number;
+  prefix?: string; // e.g., "SUMMER-"
+  suffix?: string; // e.g., "-2025"
+  customCharset?: string; // For custom pattern
+  excludeChars?: string; // e.g., "0O1I" to avoid confusion
+  uppercase?: boolean; // Default true
+}
+
+/**
+ * Batch code generation request
+ */
+export interface BatchCodeGenerationInput {
+  discountId: string;
+  count: number;
+  options: CodeGenerationOptions;
+}
+
+/**
+ * Generated code entity (for batch-generated codes)
+ */
+export interface GeneratedCode {
+  id: string;
+  code: string;
+  discountId: string;
+  usedBy?: string; // customerId if redeemed
+  usedAt?: Date;
+  orderId?: string;
+  createdAt: Date;
+}
+
+/**
+ * Code validation result
+ */
+export interface CodeValidationResult {
+  valid: boolean;
+  discount?: Discount;
+  reason?: string;
+  // Validation details
+  isExpired?: boolean;
+  isInactive?: boolean;
+  usageLimitReached?: boolean;
+  customerUsageLimitReached?: boolean;
+  conditionsNotMet?: string[];
+}
+
+/**
+ * Input for validating a code
+ */
+export interface CodeValidationInput {
+  code: string;
+  customerId?: string;
+  context?: {
+    subtotal?: number;
+    items?: { productId: string; categoryId?: string; quantity: number }[];
+  };
+}
+

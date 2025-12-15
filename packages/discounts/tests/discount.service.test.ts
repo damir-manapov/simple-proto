@@ -219,7 +219,7 @@ describe("DiscountService", () => {
         value: { type: "percentage", percentage: 10 },
       });
 
-      const result = service.validateCode("VALID", { items: [], appliedCodes: [] });
+      const result = service.validateCode({ code: "VALID" });
 
       expect(result.valid).toBe(true);
       expect(result.discount).toBeDefined();
@@ -234,10 +234,10 @@ describe("DiscountService", () => {
         validUntil: new Date("2020-01-01"),
       });
 
-      const result = service.validateCode("EXPIRED", { items: [], appliedCodes: [] });
+      const result = service.validateCode({ code: "EXPIRED" });
 
       expect(result.valid).toBe(false);
-      expect(result.reason).toBe("Discount has expired");
+      expect(result.isExpired).toBe(true);
     });
 
     it("should reject code at usage limit", () => {
@@ -252,10 +252,10 @@ describe("DiscountService", () => {
       // Record one usage
       service.recordUsage({ discountId: discount.id, orderId: "order1", amount: 10 });
 
-      const result = service.validateCode("LIMITED", { items: [], appliedCodes: [] });
+      const result = service.validateCode({ code: "LIMITED" });
 
       expect(result.valid).toBe(false);
-      expect(result.reason).toBe("Discount usage limit reached");
+      expect(result.usageLimitReached).toBe(true);
     });
   });
 
@@ -395,6 +395,293 @@ describe("DiscountService", () => {
 
       expect(result.shippingDiscount).toBe(15);
       expect(result.finalTotal).toBe(120); // 120 subtotal + 0 shipping
+    });
+  });
+
+  describe("Code Generation", () => {
+    it("should generate a single code", () => {
+      const discount = service.createDiscount({
+        name: "Promo Discount",
+        target: { type: "cart" },
+        value: { type: "percentage", percentage: 10 },
+      });
+
+      const code = service.generateCode(discount.id, {
+        pattern: "alphanumeric",
+        length: 8,
+      });
+
+      expect(code).toHaveLength(8);
+      expect(code).toMatch(/^[A-Z0-9]+$/);
+    });
+
+    it("should generate code with prefix and suffix", () => {
+      const discount = service.createDiscount({
+        name: "Summer Sale",
+        target: { type: "cart" },
+        value: { type: "percentage", percentage: 20 },
+      });
+
+      const code = service.generateCode(discount.id, {
+        pattern: "alphanumeric",
+        length: 4,
+        prefix: "SUMMER-",
+        suffix: "-25",
+      });
+
+      expect(code).toMatch(/^SUMMER-[A-Z0-9]{4}-25$/);
+    });
+
+    it("should generate batch of unique codes", () => {
+      const discount = service.createDiscount({
+        name: "Batch Discount",
+        target: { type: "cart" },
+        value: { type: "fixedAmount", amount: 5 },
+      });
+
+      const codes = service.generateCodeBatch(discount.id, 10, {
+        pattern: "alphanumeric",
+        length: 8,
+      });
+
+      expect(codes).toHaveLength(10);
+      const uniqueCodes = new Set(codes.map((c) => c.code));
+      expect(uniqueCodes.size).toBe(10);
+    });
+
+    it("should throw when generating code for non-existent discount", () => {
+      expect(() => {
+        service.generateCode("non-existent", {
+          pattern: "alphanumeric",
+          length: 8,
+        });
+      }).toThrow("not found");
+    });
+
+    it("should retrieve generated codes for a discount", () => {
+      const discount = service.createDiscount({
+        name: "Test",
+        target: { type: "cart" },
+        value: { type: "percentage", percentage: 10 },
+      });
+
+      service.generateCodeBatch(discount.id, 5, {
+        pattern: "numeric",
+        length: 6,
+      });
+
+      const codes = service.getGeneratedCodesForDiscount(discount.id);
+      expect(codes).toHaveLength(5);
+    });
+
+    it("should redeem a generated code", () => {
+      const discount = service.createDiscount({
+        name: "Single Use",
+        target: { type: "cart" },
+        value: { type: "percentage", percentage: 15 },
+      });
+
+      const code = service.generateCode(discount.id, {
+        pattern: "alphanumeric",
+        length: 8,
+      });
+
+      const redeemed = service.redeemGeneratedCode(code, "customer-123", "order-456");
+
+      expect(redeemed).not.toBeNull();
+      expect(redeemed?.usedBy).toBe("customer-123");
+      expect(redeemed?.orderId).toBe("order-456");
+      expect(redeemed?.usedAt).toBeDefined();
+    });
+
+    it("should not allow double redemption", () => {
+      const discount = service.createDiscount({
+        name: "Single Use",
+        target: { type: "cart" },
+        value: { type: "percentage", percentage: 15 },
+      });
+
+      const code = service.generateCode(discount.id, {
+        pattern: "alphanumeric",
+        length: 8,
+      });
+
+      service.redeemGeneratedCode(code, "customer-1", "order-1");
+
+      expect(() => {
+        service.redeemGeneratedCode(code, "customer-2", "order-2");
+      }).toThrow("already been redeemed");
+    });
+  });
+
+  describe("Code Validation", () => {
+    it("should validate a valid discount code", () => {
+      service.createDiscount({
+        name: "Active Discount",
+        code: "VALID10",
+        target: { type: "cart" },
+        value: { type: "percentage", percentage: 10 },
+        status: "active",
+      });
+
+      const result = service.validateCode({ code: "VALID10" });
+
+      expect(result.valid).toBe(true);
+      expect(result.discount).toBeDefined();
+      expect(result.discount?.code).toBe("VALID10");
+    });
+
+    it("should reject invalid code", () => {
+      const result = service.validateCode({ code: "INVALID" });
+
+      expect(result.valid).toBe(false);
+      expect(result.reason).toBe("Invalid code");
+    });
+
+    it("should reject inactive discount", () => {
+      service.createDiscount({
+        name: "Inactive",
+        code: "INACTIVE",
+        target: { type: "cart" },
+        value: { type: "percentage", percentage: 10 },
+        status: "inactive",
+      });
+
+      const result = service.validateCode({ code: "INACTIVE" });
+
+      expect(result.valid).toBe(false);
+      expect(result.isInactive).toBe(true);
+    });
+
+    it("should reject expired discount", () => {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      service.createDiscount({
+        name: "Expired",
+        code: "EXPIRED",
+        target: { type: "cart" },
+        value: { type: "percentage", percentage: 10 },
+        validUntil: yesterday,
+      });
+
+      const result = service.validateCode({ code: "EXPIRED" });
+
+      expect(result.valid).toBe(false);
+      expect(result.isExpired).toBe(true);
+    });
+
+    it("should reject when usage limit reached", () => {
+      const discount = service.createDiscount({
+        name: "Limited",
+        code: "LIMITED",
+        target: { type: "cart" },
+        value: { type: "percentage", percentage: 10 },
+        usageLimit: 1,
+      });
+
+      // Record one usage
+      service.recordUsage({
+        discountId: discount.id,
+        orderId: "order-1",
+        amount: 10,
+      });
+
+      const result = service.validateCode({ code: "LIMITED" });
+
+      expect(result.valid).toBe(false);
+      expect(result.usageLimitReached).toBe(true);
+    });
+
+    it("should reject when customer usage limit reached", () => {
+      const discount = service.createDiscount({
+        name: "Per Customer",
+        code: "ONCEPER",
+        target: { type: "cart" },
+        value: { type: "percentage", percentage: 10 },
+        usageLimitPerCustomer: 1,
+      });
+
+      service.recordUsage({
+        discountId: discount.id,
+        customerId: "customer-123",
+        orderId: "order-1",
+        amount: 10,
+      });
+
+      const result = service.validateCode({
+        code: "ONCEPER",
+        customerId: "customer-123",
+      });
+
+      expect(result.valid).toBe(false);
+      expect(result.customerUsageLimitReached).toBe(true);
+    });
+
+    it("should validate generated code", () => {
+      const discount = service.createDiscount({
+        name: "Generated",
+        target: { type: "cart" },
+        value: { type: "percentage", percentage: 20 },
+      });
+
+      const code = service.generateCode(discount.id, {
+        pattern: "alphanumeric",
+        length: 8,
+      });
+
+      const result = service.validateCode({ code });
+
+      expect(result.valid).toBe(true);
+      expect(result.discount?.id).toBe(discount.id);
+    });
+
+    it("should reject already redeemed generated code", () => {
+      const discount = service.createDiscount({
+        name: "Single Use Generated",
+        target: { type: "cart" },
+        value: { type: "percentage", percentage: 25 },
+      });
+
+      const code = service.generateCode(discount.id, {
+        pattern: "alphanumeric",
+        length: 8,
+      });
+
+      service.redeemGeneratedCode(code, "customer-1", "order-1");
+
+      const result = service.validateCode({ code });
+
+      expect(result.valid).toBe(false);
+      expect(result.reason).toBe("Code has already been redeemed");
+    });
+
+    it("should check conditions when context provided", () => {
+      service.createDiscount({
+        name: "Min Amount",
+        code: "MIN100",
+        target: { type: "cart" },
+        value: { type: "percentage", percentage: 10 },
+        conditions: [{ type: "minAmount", amount: 100 }],
+      });
+
+      const resultLow = service.validateCode({
+        code: "MIN100",
+        context: {
+          items: [{ productId: "p1", quantity: 1 }],
+        },
+      });
+
+      expect(resultLow.valid).toBe(false);
+      expect(resultLow.conditionsNotMet).toContain("minAmount");
+
+      // Note: minAmount condition needs items with prices in the actual cart
+      // For validation, we just check that a code exists and is valid
+      const resultOk = service.validateCode({
+        code: "MIN100",
+      });
+
+      expect(resultOk.valid).toBe(true);
     });
   });
 });

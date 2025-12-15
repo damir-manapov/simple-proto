@@ -14,10 +14,17 @@ import type {
   DiscountValue,
   DiscountCondition,
   CartContext,
+  CartItem,
   DiscountResult,
   CalculationOptions,
+  CodeGenerationOptions,
+  GeneratedCode,
+  CodeValidationResult,
+  CodeValidationInput,
 } from "@simple-proto/discounts-types";
 import { DiscountEvaluator } from "./discount-evaluator.js";
+import { CodeGenerator } from "./code-generator.js";
+import { ConditionEvaluator } from "./condition-evaluator.js";
 
 interface DiscountEntry extends Entry {
   name: string;
@@ -73,8 +80,24 @@ interface UsageEntryInput extends EntryInput {
   usedAt?: string;
 }
 
+interface GeneratedCodeEntry extends Entry {
+  code: string;
+  discountId: string;
+  usedBy?: string;
+  usedAt?: string;
+  orderId?: string;
+  createdAt: string;
+}
+
+interface GeneratedCodeEntryInput extends EntryInput {
+  code: string;
+  discountId: string;
+  createdAt?: string;
+}
+
 const DISCOUNT_COLLECTION = "discounts";
 const USAGE_COLLECTION = "discount_usage";
+const GENERATED_CODES_COLLECTION = "generated_codes";
 
 /**
  * Service for managing discounts
@@ -82,11 +105,15 @@ const USAGE_COLLECTION = "discount_usage";
 export class DiscountService {
   private readonly storage: IStorage;
   private readonly evaluator: DiscountEvaluator;
+  private readonly codeGenerator: CodeGenerator;
+  private readonly conditionEvaluator: ConditionEvaluator;
   private initialized = false;
 
   constructor(storage: IStorage) {
     this.storage = storage;
     this.evaluator = new DiscountEvaluator();
+    this.codeGenerator = new CodeGenerator();
+    this.conditionEvaluator = new ConditionEvaluator();
   }
 
   private ensureInitialized(): void {
@@ -102,6 +129,13 @@ export class DiscountService {
     if (!this.storage.hasCollection(USAGE_COLLECTION)) {
       this.storage.registerCollection({
         name: USAGE_COLLECTION,
+        schema: { type: "object" },
+      });
+    }
+
+    if (!this.storage.hasCollection(GENERATED_CODES_COLLECTION)) {
+      this.storage.registerCollection({
+        name: GENERATED_CODES_COLLECTION,
         schema: { type: "object" },
       });
     }
@@ -220,46 +254,6 @@ export class DiscountService {
     return this.evaluator.evaluate(discounts, context, options);
   }
 
-  /**
-   * Validate a promo code without applying it
-   */
-  validateCode(code: string, context: CartContext): { valid: boolean; reason?: string; discount?: Discount } {
-    this.ensureInitialized();
-
-    const discount = this.getDiscountByCode(code);
-    if (!discount) {
-      return { valid: false, reason: "Invalid code" };
-    }
-
-    const now = context.evaluationDate ?? new Date();
-
-    if (discount.status !== "active") {
-      return { valid: false, reason: "Discount is not active" };
-    }
-
-    if (discount.validFrom && now < discount.validFrom) {
-      return { valid: false, reason: "Discount is not yet valid" };
-    }
-
-    if (discount.validUntil && now > discount.validUntil) {
-      return { valid: false, reason: "Discount has expired" };
-    }
-
-    if (discount.usageLimit !== undefined && discount.currentUsage >= discount.usageLimit) {
-      return { valid: false, reason: "Discount usage limit reached" };
-    }
-
-    // Check per-customer usage
-    if (discount.usageLimitPerCustomer !== undefined && context.customer?.id) {
-      const customerUsage = this.getCustomerUsage(discount.id, context.customer.id);
-      if (customerUsage >= discount.usageLimitPerCustomer) {
-        return { valid: false, reason: "You have already used this code the maximum number of times" };
-      }
-    }
-
-    return { valid: true, discount };
-  }
-
   // ==================== Usage Tracking ====================
 
   /**
@@ -314,6 +308,293 @@ export class DiscountService {
     return entries.map((e) => this.usageEntryToUsage(e));
   }
 
+  // ==================== Code Generation ====================
+
+  /**
+   * Generate a single promo code for a discount
+   */
+  generateCode(discountId: string, options: CodeGenerationOptions): string {
+    this.ensureInitialized();
+
+    const discount = this.getDiscount(discountId);
+    if (!discount) {
+      throw new Error(`Discount ${discountId} not found`);
+    }
+
+    const existingCodes = this.getAllCodes();
+    let code: string;
+    let attempts = 0;
+    const maxAttempts = 100;
+
+    do {
+      code = this.codeGenerator.generate(options);
+      attempts++;
+    } while (existingCodes.has(code) && attempts < maxAttempts);
+
+    if (existingCodes.has(code)) {
+      throw new Error("Could not generate unique code after max attempts");
+    }
+
+    // Store the generated code
+    const repo = this.storage.getRepository<GeneratedCodeEntry, GeneratedCodeEntryInput>(
+      GENERATED_CODES_COLLECTION
+    );
+    repo.create({
+      code,
+      discountId,
+      createdAt: new Date().toISOString(),
+    });
+
+    return code;
+  }
+
+  /**
+   * Generate batch of promo codes for a discount
+   */
+  generateCodeBatch(
+    discountId: string,
+    count: number,
+    options: CodeGenerationOptions
+  ): GeneratedCode[] {
+    this.ensureInitialized();
+
+    const discount = this.getDiscount(discountId);
+    if (!discount) {
+      throw new Error(`Discount ${discountId} not found`);
+    }
+
+    const existingCodes = this.getAllCodes();
+    const codes = this.codeGenerator.generateBatch(count, options, existingCodes);
+
+    const repo = this.storage.getRepository<GeneratedCodeEntry, GeneratedCodeEntryInput>(
+      GENERATED_CODES_COLLECTION
+    );
+    const now = new Date().toISOString();
+
+    const entries: GeneratedCode[] = [];
+    for (const code of codes) {
+      const entry = repo.create({
+        code,
+        discountId,
+        createdAt: now,
+      });
+      entries.push(this.generatedCodeEntryToGeneratedCode(entry));
+    }
+
+    return entries;
+  }
+
+  /**
+   * Get generated code by code string
+   */
+  getGeneratedCode(code: string): GeneratedCode | null {
+    this.ensureInitialized();
+    const repo = this.storage.getRepository<GeneratedCodeEntry>(GENERATED_CODES_COLLECTION);
+    const entries = repo.findAll({ code: { eq: code } });
+    const entry = entries[0];
+    return entry ? this.generatedCodeEntryToGeneratedCode(entry) : null;
+  }
+
+  /**
+   * Get all generated codes for a discount
+   */
+  getGeneratedCodesForDiscount(discountId: string): GeneratedCode[] {
+    this.ensureInitialized();
+    const repo = this.storage.getRepository<GeneratedCodeEntry>(GENERATED_CODES_COLLECTION);
+    const entries = repo.findAll({ discountId: { eq: discountId } });
+    return entries.map((e) => this.generatedCodeEntryToGeneratedCode(e));
+  }
+
+  /**
+   * Mark a generated code as used
+   */
+  redeemGeneratedCode(code: string, customerId: string, orderId: string): GeneratedCode | null {
+    this.ensureInitialized();
+    const repo = this.storage.getRepository<GeneratedCodeEntry>(GENERATED_CODES_COLLECTION);
+    const entries = repo.findAll({ code: { eq: code } });
+    const entry = entries[0];
+
+    if (!entry) return null;
+    if (entry.usedBy) {
+      throw new Error(`Code ${code} has already been redeemed`);
+    }
+
+    const updated = repo.update(entry.id, {
+      ...entry,
+      usedBy: customerId,
+      usedAt: new Date().toISOString(),
+      orderId,
+    });
+
+    return updated ? this.generatedCodeEntryToGeneratedCode(updated) : null;
+  }
+
+  // ==================== Code Validation ====================
+
+  /**
+   * Validate a promo code
+   */
+  validateCode(input: CodeValidationInput): CodeValidationResult {
+    this.ensureInitialized();
+
+    // First check generated codes
+    const generatedCode = this.getGeneratedCode(input.code);
+    if (generatedCode) {
+      if (generatedCode.usedBy) {
+        return {
+          valid: false,
+          reason: "Code has already been redeemed",
+        };
+      }
+
+      const discount = this.getDiscount(generatedCode.discountId);
+      if (!discount) {
+        return {
+          valid: false,
+          reason: "Discount no longer exists",
+        };
+      }
+
+      return this.validateDiscountForCode(discount, input);
+    }
+
+    // Check regular discount codes
+    const discount = this.getDiscountByCode(input.code);
+    if (!discount) {
+      return {
+        valid: false,
+        reason: "Invalid code",
+      };
+    }
+
+    return this.validateDiscountForCode(discount, input);
+  }
+
+  private validateDiscountForCode(
+    discount: Discount,
+    input: CodeValidationInput
+  ): CodeValidationResult {
+    const now = new Date();
+    const conditionsNotMet: string[] = [];
+
+    // Check status
+    if (discount.status !== "active") {
+      return {
+        valid: false,
+        discount,
+        reason: `Discount is ${discount.status}`,
+        isInactive: discount.status === "inactive",
+        isExpired: discount.status === "expired",
+      };
+    }
+
+    // Check validity period
+    if (discount.validFrom && now < discount.validFrom) {
+      return {
+        valid: false,
+        discount,
+        reason: "Discount is not yet active",
+      };
+    }
+
+    if (discount.validUntil && now > discount.validUntil) {
+      return {
+        valid: false,
+        discount,
+        reason: "Discount has expired",
+        isExpired: true,
+      };
+    }
+
+    // Check usage limit
+    if (discount.usageLimit && discount.currentUsage >= discount.usageLimit) {
+      return {
+        valid: false,
+        discount,
+        reason: "Usage limit reached",
+        usageLimitReached: true,
+      };
+    }
+
+    // Check customer usage limit
+    if (input.customerId && discount.usageLimitPerCustomer) {
+      const customerUsage = this.getCustomerUsage(discount.id, input.customerId);
+      if (customerUsage >= discount.usageLimitPerCustomer) {
+        return {
+          valid: false,
+          discount,
+          reason: "Customer usage limit reached",
+          customerUsageLimitReached: true,
+        };
+      }
+    }
+
+    // Check conditions if context provided
+    if (input.context && discount.conditions.length > 0) {
+      const items: CartItem[] = [];
+      if (input.context.items) {
+        for (const i of input.context.items) {
+          const item: CartItem = {
+            productId: i.productId,
+            quantity: i.quantity,
+            unitPrice: 0, // Not needed for validation
+          };
+          if (i.categoryId !== undefined) {
+            item.categoryId = i.categoryId;
+          }
+          items.push(item);
+        }
+      }
+
+      const cartContext: CartContext = {
+        items,
+        appliedCodes: [input.code],
+      };
+      if (input.customerId) {
+        cartContext.customer = { id: input.customerId };
+      }
+
+      for (const condition of discount.conditions) {
+        if (!this.conditionEvaluator.evaluate(condition, cartContext)) {
+          conditionsNotMet.push(condition.type);
+        }
+      }
+
+      if (conditionsNotMet.length > 0) {
+        return {
+          valid: false,
+          discount,
+          reason: "Conditions not met",
+          conditionsNotMet,
+        };
+      }
+    }
+
+    return {
+      valid: true,
+      discount,
+    };
+  }
+
+  private getAllCodes(): Set<string> {
+    const codes = new Set<string>();
+
+    // Get all discount codes
+    const discounts = this.listDiscounts();
+    for (const d of discounts) {
+      if (d.code) codes.add(d.code);
+    }
+
+    // Get all generated codes
+    const repo = this.storage.getRepository<GeneratedCodeEntry>(GENERATED_CODES_COLLECTION);
+    const generatedCodes = repo.findAll({});
+    for (const gc of generatedCodes) {
+      codes.add(gc.code);
+    }
+
+    return codes;
+  }
+
   // ==================== Helpers ====================
 
   private entryToDiscount(entry: DiscountEntry): Discount {
@@ -346,6 +627,18 @@ export class DiscountService {
       amount: entry.amount,
       usedAt: new Date(entry.usedAt),
       ...(entry.customerId !== undefined && { customerId: entry.customerId }),
+    };
+  }
+
+  private generatedCodeEntryToGeneratedCode(entry: GeneratedCodeEntry): GeneratedCode {
+    return {
+      id: entry.id,
+      code: entry.code,
+      discountId: entry.discountId,
+      createdAt: new Date(entry.createdAt),
+      ...(entry.usedBy !== undefined && { usedBy: entry.usedBy }),
+      ...(entry.usedAt !== undefined && { usedAt: new Date(entry.usedAt) }),
+      ...(entry.orderId !== undefined && { orderId: entry.orderId }),
     };
   }
 }
