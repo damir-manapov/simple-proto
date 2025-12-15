@@ -1,0 +1,14 @@
+{
+  "name": "@simple-proto/discounts-types",
+  "version": "0.0.1",
+  "author": "Damir Manapov",
+  "license": "MIT",
+  "type": "module",
+  "main": "./src/index.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

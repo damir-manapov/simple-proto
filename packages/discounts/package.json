@@ -1,0 +1,21 @@
+{
+  "name": "@simple-proto/discounts",
+  "version": "0.0.1",
+  "author": "Damir Manapov",
+  "license": "MIT",
+  "type": "module",
+  "main": "./src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@simple-proto/discounts-types": "workspace:*",
+    "@simple-proto/storage-types": "workspace:*"
+  },
+  "devDependencies": {
+    "@simple-proto/storage-memory": "workspace:*",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.15"
+  }
+}
