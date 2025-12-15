@@ -10,6 +10,7 @@ import { ReportsModule } from "../reports/reports.module.js";
 import { MdmModule } from "../mdm/mdm.module.js";
 import { WorkflowModule } from "../workflow/workflow.module.js";
 import { DiscountsModule } from "../discounts/discounts.module.js";
+import { TransformModule } from "../transform/transform.module.js";
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { DiscountsModule } from "../discounts/discounts.module.js";
     MdmModule,
     WorkflowModule,
     DiscountsModule,
+    TransformModule,
   ],
   controllers: [AppController],
   providers: [AppService],
