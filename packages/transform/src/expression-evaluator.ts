@@ -236,11 +236,8 @@ export class ExpressionEvaluator {
       case "diff": {
         const dateValue = expr.field ? this.getNestedValue(record, expr.field) : now;
         const date1 = dateValue instanceof Date ? dateValue : new Date(String(dateValue));
-        const compareValue = expr.compareTo
-          ? this.getNestedValue(record, expr.compareTo)
-          : now;
-        const date2 =
-          compareValue instanceof Date ? compareValue : new Date(String(compareValue));
+        const compareValue = expr.compareTo ? this.getNestedValue(record, expr.compareTo) : now;
+        const date2 = compareValue instanceof Date ? compareValue : new Date(String(compareValue));
         if (isNaN(date1.getTime()) || isNaN(date2.getTime())) return null;
         return this.dateDiff(date1, date2, expr.unit ?? "day");
       }
@@ -284,7 +281,7 @@ export class ExpressionEvaluator {
   private addToDate(
     date: Date,
     amount: number,
-    unit: "day" | "week" | "month" | "year" | "hour" | "minute" | "second",
+    unit: "day" | "week" | "month" | "year" | "hour" | "minute" | "second"
   ): Date {
     const result = new Date(date);
     switch (unit) {
@@ -316,7 +313,7 @@ export class ExpressionEvaluator {
   private dateDiff(
     date1: Date,
     date2: Date,
-    unit: "day" | "week" | "month" | "year" | "hour" | "minute" | "second",
+    unit: "day" | "week" | "month" | "year" | "hour" | "minute" | "second"
   ): number {
     const diffMs = date2.getTime() - date1.getTime();
     switch (unit) {
@@ -332,8 +329,7 @@ export class ExpressionEvaluator {
         return Math.floor(diffMs / (1000 * 60 * 60 * 24 * 7));
       case "month":
         return (
-          (date2.getFullYear() - date1.getFullYear()) * 12 +
-          (date2.getMonth() - date1.getMonth())
+          (date2.getFullYear() - date1.getFullYear()) * 12 + (date2.getMonth() - date1.getMonth())
         );
       case "year":
         return date2.getFullYear() - date1.getFullYear();
@@ -342,7 +338,7 @@ export class ExpressionEvaluator {
 
   private startOf(
     date: Date,
-    unit: "day" | "week" | "month" | "year" | "hour" | "minute" | "second",
+    unit: "day" | "week" | "month" | "year" | "hour" | "minute" | "second"
   ): Date {
     const result = new Date(date);
     switch (unit) {
@@ -376,7 +372,7 @@ export class ExpressionEvaluator {
 
   private endOf(
     date: Date,
-    unit: "day" | "week" | "month" | "year" | "hour" | "minute" | "second",
+    unit: "day" | "week" | "month" | "year" | "hour" | "minute" | "second"
   ): Date {
     const result = new Date(date);
     switch (unit) {

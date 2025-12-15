@@ -14,12 +14,14 @@ import { TransportService } from "../messaging-transport/transport.service.js";
 export class WorkflowService {
   private workflowService: WorkflowCoreService;
 
-  constructor(
-    storage: StorageService,
-    transport: TransportService,
-  ) {
+  constructor(storage: StorageService, transport: TransportService) {
     const messageHandler: MessageHandler = {
-      send(channel: string, recipient: unknown, message: unknown, template?: string): Promise<void> {
+      send(
+        channel: string,
+        recipient: unknown,
+        message: unknown,
+        template?: string
+      ): Promise<void> {
         transport.send({
           templateId: channel,
           recipient: String(recipient),
@@ -34,7 +36,7 @@ export class WorkflowService {
       async request(
         method: string,
         url: string,
-        options?: { headers?: Record<string, string>; body?: unknown },
+        options?: { headers?: Record<string, string>; body?: unknown }
       ): Promise<unknown> {
         const body = options?.body ? JSON.stringify(options.body) : undefined;
         const headers = options?.headers;
@@ -91,7 +93,10 @@ export class WorkflowService {
 
   // ==================== Workflow Execution ====================
 
-  async startExecution(workflowId: string, context: Record<string, unknown>): Promise<WorkflowExecution> {
+  async startExecution(
+    workflowId: string,
+    context: Record<string, unknown>
+  ): Promise<WorkflowExecution> {
     return this.workflowService.startExecution(workflowId, context);
   }
 

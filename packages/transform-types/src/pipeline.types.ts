@@ -44,19 +44,9 @@ export interface TransformStepInput {
 
 // ==================== Pipeline Run Types ====================
 
-export type PipelineRunStatus =
-  | "pending"
-  | "running"
-  | "completed"
-  | "failed"
-  | "cancelled";
+export type PipelineRunStatus = "pending" | "running" | "completed" | "failed" | "cancelled";
 
-export type StepRunStatus =
-  | "pending"
-  | "running"
-  | "completed"
-  | "failed"
-  | "skipped";
+export type StepRunStatus = "pending" | "running" | "completed" | "failed" | "skipped";
 
 export interface PipelineRun {
   id: string;

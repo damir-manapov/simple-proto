@@ -71,14 +71,14 @@ export class ExecutionController {
 
   @Post()
   async start(
-    @Body() body: { workflowId: string; context?: Record<string, unknown> },
+    @Body() body: { workflowId: string; context?: Record<string, unknown> }
   ): Promise<WorkflowExecution> {
     try {
       return await this.service.startExecution(body.workflowId, body.context ?? {});
     } catch (error) {
       throw new HttpException(
         error instanceof Error ? error.message : "Failed to start execution",
-        HttpStatus.BAD_REQUEST,
+        HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -86,7 +86,7 @@ export class ExecutionController {
   @Get()
   list(
     @Query("workflowId") workflowId?: string,
-    @Query("status") status?: ExecutionStatus,
+    @Query("status") status?: ExecutionStatus
   ): WorkflowExecution[] {
     const filter: ExecutionFilter = {};
     if (workflowId) filter.workflowId = workflowId;
@@ -106,14 +106,14 @@ export class ExecutionController {
   @Post(":id/resume")
   async resume(
     @Param("id") id: string,
-    @Body() body: { context?: Record<string, unknown> },
+    @Body() body: { context?: Record<string, unknown> }
   ): Promise<WorkflowExecution> {
     try {
       return await this.service.resumeExecution(id, body.context ?? {});
     } catch (error) {
       throw new HttpException(
         error instanceof Error ? error.message : "Failed to resume execution",
-        HttpStatus.BAD_REQUEST,
+        HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -125,7 +125,7 @@ export class ExecutionController {
     } catch (error) {
       throw new HttpException(
         error instanceof Error ? error.message : "Failed to cancel execution",
-        HttpStatus.BAD_REQUEST,
+        HttpStatus.BAD_REQUEST
       );
     }
   }

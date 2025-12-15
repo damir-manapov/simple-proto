@@ -44,7 +44,11 @@ export class CodeGenerator {
   /**
    * Generate multiple unique codes
    */
-  generateBatch(count: number, options: CodeGenerationOptions, existingCodes: Set<string> = new Set<string>()): string[] {
+  generateBatch(
+    count: number,
+    options: CodeGenerationOptions,
+    existingCodes: Set<string> = new Set<string>()
+  ): string[] {
     const codes: string[] = [];
     const allCodes = new Set(existingCodes);
     const maxAttempts = count * 10; // Prevent infinite loops
@@ -101,9 +105,10 @@ export class CodeGenerator {
   }
 
   private getCharset(options: CodeGenerationOptions): string {
-    let charset = options.pattern === "custom" && options.customCharset
-      ? options.customCharset
-      : DEFAULT_CHARSETS[options.pattern];
+    let charset =
+      options.pattern === "custom" && options.customCharset
+        ? options.customCharset
+        : DEFAULT_CHARSETS[options.pattern];
 
     if (options.excludeChars) {
       for (const char of options.excludeChars) {

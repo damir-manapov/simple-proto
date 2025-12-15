@@ -92,24 +92,28 @@ describe("Discounts Controllers (e2e)", () => {
 
     describe("GET /discounts", () => {
       it("should list all discounts", async () => {
-        await request(getServer()).post("/discounts").send({
-          name: "Discount 1",
-          target: { type: "cart" },
-          value: { type: "percentage", percentage: 5 },
-          conditions: [],
-          priority: 1,
-          stacking: "all",
-          status: "active",
-        });
-        await request(getServer()).post("/discounts").send({
-          name: "Discount 2",
-          target: { type: "cart" },
-          value: { type: "fixedAmount", amount: 10 },
-          conditions: [],
-          priority: 2,
-          stacking: "all",
-          status: "active",
-        });
+        await request(getServer())
+          .post("/discounts")
+          .send({
+            name: "Discount 1",
+            target: { type: "cart" },
+            value: { type: "percentage", percentage: 5 },
+            conditions: [],
+            priority: 1,
+            stacking: "all",
+            status: "active",
+          });
+        await request(getServer())
+          .post("/discounts")
+          .send({
+            name: "Discount 2",
+            target: { type: "cart" },
+            value: { type: "fixedAmount", amount: 10 },
+            conditions: [],
+            priority: 2,
+            stacking: "all",
+            status: "active",
+          });
 
         const response = await request(getServer()).get("/discounts").expect(200);
         const discounts = response.body as Discount[];
@@ -117,24 +121,28 @@ describe("Discounts Controllers (e2e)", () => {
       });
 
       it("should filter by status", async () => {
-        await request(getServer()).post("/discounts").send({
-          name: "Active Discount",
-          target: { type: "cart" },
-          value: { type: "percentage", percentage: 5 },
-          conditions: [],
-          priority: 1,
-          stacking: "all",
-          status: "active",
-        });
-        await request(getServer()).post("/discounts").send({
-          name: "Inactive Discount",
-          target: { type: "cart" },
-          value: { type: "percentage", percentage: 10 },
-          conditions: [],
-          priority: 2,
-          stacking: "all",
-          status: "inactive",
-        });
+        await request(getServer())
+          .post("/discounts")
+          .send({
+            name: "Active Discount",
+            target: { type: "cart" },
+            value: { type: "percentage", percentage: 5 },
+            conditions: [],
+            priority: 1,
+            stacking: "all",
+            status: "active",
+          });
+        await request(getServer())
+          .post("/discounts")
+          .send({
+            name: "Inactive Discount",
+            target: { type: "cart" },
+            value: { type: "percentage", percentage: 10 },
+            conditions: [],
+            priority: 2,
+            stacking: "all",
+            status: "inactive",
+          });
 
         const response = await request(getServer()).get("/discounts?status=active").expect(200);
         const discounts = response.body as Discount[];
@@ -145,15 +153,17 @@ describe("Discounts Controllers (e2e)", () => {
 
     describe("GET /discounts/:id", () => {
       it("should get discount by id", async () => {
-        const createResponse = await request(getServer()).post("/discounts").send({
-          name: "Test Discount",
-          target: { type: "cart" },
-          value: { type: "percentage", percentage: 15 },
-          conditions: [],
-          priority: 1,
-          stacking: "all",
-          status: "active",
-        });
+        const createResponse = await request(getServer())
+          .post("/discounts")
+          .send({
+            name: "Test Discount",
+            target: { type: "cart" },
+            value: { type: "percentage", percentage: 15 },
+            conditions: [],
+            priority: 1,
+            stacking: "all",
+            status: "active",
+          });
         const created = createResponse.body as Discount;
 
         const response = await request(getServer()).get(`/discounts/${created.id}`).expect(200);
@@ -169,16 +179,18 @@ describe("Discounts Controllers (e2e)", () => {
 
     describe("GET /discounts/by-code/:code", () => {
       it("should get discount by code", async () => {
-        await request(getServer()).post("/discounts").send({
-          name: "Promo Discount",
-          code: "PROMO2024",
-          target: { type: "cart" },
-          value: { type: "percentage", percentage: 20 },
-          conditions: [],
-          priority: 1,
-          stacking: "all",
-          status: "active",
-        });
+        await request(getServer())
+          .post("/discounts")
+          .send({
+            name: "Promo Discount",
+            code: "PROMO2024",
+            target: { type: "cart" },
+            value: { type: "percentage", percentage: 20 },
+            conditions: [],
+            priority: 1,
+            stacking: "all",
+            status: "active",
+          });
 
         const response = await request(getServer()).get("/discounts/by-code/PROMO2024").expect(200);
         const discount = response.body as Discount;
@@ -193,15 +205,17 @@ describe("Discounts Controllers (e2e)", () => {
 
     describe("PUT /discounts/:id", () => {
       it("should update a discount", async () => {
-        const createResponse = await request(getServer()).post("/discounts").send({
-          name: "Original Name",
-          target: { type: "cart" },
-          value: { type: "percentage", percentage: 10 },
-          conditions: [],
-          priority: 1,
-          stacking: "all",
-          status: "active",
-        });
+        const createResponse = await request(getServer())
+          .post("/discounts")
+          .send({
+            name: "Original Name",
+            target: { type: "cart" },
+            value: { type: "percentage", percentage: 10 },
+            conditions: [],
+            priority: 1,
+            stacking: "all",
+            status: "active",
+          });
         const created = createResponse.body as Discount;
 
         const response = await request(getServer())
@@ -223,15 +237,17 @@ describe("Discounts Controllers (e2e)", () => {
 
     describe("DELETE /discounts/:id", () => {
       it("should delete a discount", async () => {
-        const createResponse = await request(getServer()).post("/discounts").send({
-          name: "To Delete",
-          target: { type: "cart" },
-          value: { type: "percentage", percentage: 5 },
-          conditions: [],
-          priority: 1,
-          stacking: "all",
-          status: "active",
-        });
+        const createResponse = await request(getServer())
+          .post("/discounts")
+          .send({
+            name: "To Delete",
+            target: { type: "cart" },
+            value: { type: "percentage", percentage: 5 },
+            conditions: [],
+            priority: 1,
+            stacking: "all",
+            status: "active",
+          });
         const created = createResponse.body as Discount;
 
         await request(getServer()).delete(`/discounts/${created.id}`).expect(200);
@@ -245,16 +261,18 @@ describe("Discounts Controllers (e2e)", () => {
 
     describe("POST /discounts/calculate", () => {
       it("should calculate discounts for cart", async () => {
-        await request(getServer()).post("/discounts").send({
-          name: "10% Off",
-          code: "SAVE10",
-          target: { type: "cart" },
-          value: { type: "percentage", percentage: 10 },
-          conditions: [],
-          priority: 1,
-          stacking: "all",
-          status: "active",
-        });
+        await request(getServer())
+          .post("/discounts")
+          .send({
+            name: "10% Off",
+            code: "SAVE10",
+            target: { type: "cart" },
+            value: { type: "percentage", percentage: 10 },
+            conditions: [],
+            priority: 1,
+            stacking: "all",
+            status: "active",
+          });
 
         const response = await request(getServer())
           .post("/discounts/calculate")
@@ -277,26 +295,30 @@ describe("Discounts Controllers (e2e)", () => {
       });
 
       it("should respect stacking strategy", async () => {
-        await request(getServer()).post("/discounts").send({
-          name: "10% Off",
-          code: "SAVE10",
-          target: { type: "cart" },
-          value: { type: "percentage", percentage: 10 },
-          conditions: [],
-          priority: 1,
-          stacking: "all",
-          status: "active",
-        });
-        await request(getServer()).post("/discounts").send({
-          name: "$5 Off",
-          code: "FLAT5",
-          target: { type: "cart" },
-          value: { type: "fixedAmount", amount: 5 },
-          conditions: [],
-          priority: 2,
-          stacking: "all",
-          status: "active",
-        });
+        await request(getServer())
+          .post("/discounts")
+          .send({
+            name: "10% Off",
+            code: "SAVE10",
+            target: { type: "cart" },
+            value: { type: "percentage", percentage: 10 },
+            conditions: [],
+            priority: 1,
+            stacking: "all",
+            status: "active",
+          });
+        await request(getServer())
+          .post("/discounts")
+          .send({
+            name: "$5 Off",
+            code: "FLAT5",
+            target: { type: "cart" },
+            value: { type: "fixedAmount", amount: 5 },
+            conditions: [],
+            priority: 2,
+            stacking: "all",
+            status: "active",
+          });
 
         const response = await request(getServer())
           .post("/discounts/calculate")
@@ -336,15 +358,17 @@ describe("Discounts Controllers (e2e)", () => {
   describe("UsageController", () => {
     describe("POST /discount-usages", () => {
       it("should record usage", async () => {
-        const createResponse = await request(getServer()).post("/discounts").send({
-          name: "Limited Use",
-          target: { type: "cart" },
-          value: { type: "percentage", percentage: 10 },
-          conditions: [],
-          priority: 1,
-          stacking: "all",
-          status: "active",
-        });
+        const createResponse = await request(getServer())
+          .post("/discounts")
+          .send({
+            name: "Limited Use",
+            target: { type: "cart" },
+            value: { type: "percentage", percentage: 10 },
+            conditions: [],
+            priority: 1,
+            stacking: "all",
+            status: "active",
+          });
         const discount = createResponse.body as Discount;
 
         const response = await request(getServer())
@@ -365,15 +389,17 @@ describe("Discounts Controllers (e2e)", () => {
 
     describe("GET /discount-usages/count", () => {
       it("should get usage count for customer", async () => {
-        const createResponse = await request(getServer()).post("/discounts").send({
-          name: "Limited Use",
-          target: { type: "cart" },
-          value: { type: "percentage", percentage: 10 },
-          conditions: [],
-          priority: 1,
-          stacking: "all",
-          status: "active",
-        });
+        const createResponse = await request(getServer())
+          .post("/discounts")
+          .send({
+            name: "Limited Use",
+            target: { type: "cart" },
+            value: { type: "percentage", percentage: 10 },
+            conditions: [],
+            priority: 1,
+            stacking: "all",
+            status: "active",
+          });
         const discount = createResponse.body as Discount;
 
         await request(getServer()).post("/discount-usages").send({
@@ -468,9 +494,7 @@ describe("Discounts Controllers (e2e)", () => {
         expect(firstGenerated).toBeDefined();
         const codeValue = firstGenerated?.code ?? "";
 
-        const response = await request(getServer())
-          .get(`/discount-codes/${codeValue}`)
-          .expect(200);
+        const response = await request(getServer()).get(`/discount-codes/${codeValue}`).expect(200);
 
         const codeResult = response.body as GeneratedCode;
         expect(codeResult.code).toBe(codeValue);
@@ -478,9 +502,7 @@ describe("Discounts Controllers (e2e)", () => {
       });
 
       it("should return 404 if code not found", async () => {
-        await request(getServer())
-          .get("/discount-codes/INVALID-CODE")
-          .expect(404);
+        await request(getServer()).get("/discount-codes/INVALID-CODE").expect(404);
       });
     });
 
@@ -514,9 +536,7 @@ describe("Discounts Controllers (e2e)", () => {
       });
 
       it("should return 400 if discountId not provided", async () => {
-        await request(getServer())
-          .get("/discount-codes")
-          .expect(400);
+        await request(getServer()).get("/discount-codes").expect(400);
       });
     });
 

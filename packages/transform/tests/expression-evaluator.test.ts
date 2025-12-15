@@ -43,8 +43,8 @@ describe("ExpressionEvaluator", () => {
               { type: "field", path: "last" },
             ],
           },
-          record,
-        ),
+          record
+        )
       ).toBe("John Doe");
     });
 
@@ -61,8 +61,8 @@ describe("ExpressionEvaluator", () => {
             ],
             separator: "-",
           },
-          record,
-        ),
+          record
+        )
       ).toBe("1-2-3");
     });
   });
@@ -73,15 +73,15 @@ describe("ExpressionEvaluator", () => {
       expect(
         evaluator.evaluate(
           { type: "template", template: "Hello {{name}}, your order {{orderId}} is ready" },
-          record,
-        ),
+          record
+        )
       ).toBe("Hello John, your order ORD-123 is ready");
     });
 
     it("should handle missing variables", () => {
       const record = { name: "John" };
       expect(
-        evaluator.evaluate({ type: "template", template: "Hello {{name}}, id: {{id}}" }, record),
+        evaluator.evaluate({ type: "template", template: "Hello {{name}}, id: {{id}}" }, record)
       ).toBe("Hello John, id: ");
     });
   });
@@ -97,8 +97,8 @@ describe("ExpressionEvaluator", () => {
             left: { type: "field", path: "a" },
             right: { type: "field", path: "b" },
           },
-          record,
-        ),
+          record
+        )
       ).toBe(15);
     });
 
@@ -112,8 +112,8 @@ describe("ExpressionEvaluator", () => {
             left: { type: "field", path: "a" },
             right: { type: "field", path: "b" },
           },
-          record,
-        ),
+          record
+        )
       ).toBe(5);
     });
 
@@ -127,8 +127,8 @@ describe("ExpressionEvaluator", () => {
             left: { type: "field", path: "price" },
             right: { type: "field", path: "quantity" },
           },
-          record,
-        ),
+          record
+        )
       ).toBe(30);
     });
 
@@ -142,8 +142,8 @@ describe("ExpressionEvaluator", () => {
             left: { type: "field", path: "total" },
             right: { type: "field", path: "count" },
           },
-          record,
-        ),
+          record
+        )
       ).toBe(25);
     });
 
@@ -152,8 +152,8 @@ describe("ExpressionEvaluator", () => {
       expect(
         evaluator.evaluate(
           { type: "math", operator: "round", left: { type: "field", path: "value" } },
-          record,
-        ),
+          record
+        )
       ).toBe(4);
     });
 
@@ -162,8 +162,8 @@ describe("ExpressionEvaluator", () => {
       expect(
         evaluator.evaluate(
           { type: "math", operator: "floor", left: { type: "field", path: "value" } },
-          record,
-        ),
+          record
+        )
       ).toBe(3);
     });
 
@@ -172,8 +172,8 @@ describe("ExpressionEvaluator", () => {
       expect(
         evaluator.evaluate(
           { type: "math", operator: "ceil", left: { type: "field", path: "value" } },
-          record,
-        ),
+          record
+        )
       ).toBe(4);
     });
   });
@@ -191,8 +191,8 @@ describe("ExpressionEvaluator", () => {
               { type: "field", path: "c" },
             ],
           },
-          record,
-        ),
+          record
+        )
       ).toBe("found");
     });
 
@@ -207,8 +207,8 @@ describe("ExpressionEvaluator", () => {
               { type: "field", path: "b" },
             ],
           },
-          record,
-        ),
+          record
+        )
       ).toBeNull();
     });
   });
@@ -224,8 +224,8 @@ describe("ExpressionEvaluator", () => {
             then: { type: "literal", value: "adult" },
             else: { type: "literal", value: "minor" },
           },
-          record,
-        ),
+          record
+        )
       ).toBe("adult");
     });
 
@@ -239,8 +239,8 @@ describe("ExpressionEvaluator", () => {
             then: { type: "literal", value: "adult" },
             else: { type: "literal", value: "minor" },
           },
-          record,
-        ),
+          record
+        )
       ).toBe("minor");
     });
   });
@@ -249,22 +249,22 @@ describe("ExpressionEvaluator", () => {
     it("should get array length", () => {
       const record = { items: [1, 2, 3, 4, 5] };
       expect(
-        evaluator.evaluate({ type: "array", operation: "length", path: "items" }, record),
+        evaluator.evaluate({ type: "array", operation: "length", path: "items" }, record)
       ).toBe(5);
     });
 
     it("should get first element", () => {
       const record = { items: ["a", "b", "c"] };
-      expect(
-        evaluator.evaluate({ type: "array", operation: "first", path: "items" }, record),
-      ).toBe("a");
+      expect(evaluator.evaluate({ type: "array", operation: "first", path: "items" }, record)).toBe(
+        "a"
+      );
     });
 
     it("should get last element", () => {
       const record = { items: ["a", "b", "c"] };
-      expect(
-        evaluator.evaluate({ type: "array", operation: "last", path: "items" }, record),
-      ).toBe("c");
+      expect(evaluator.evaluate({ type: "array", operation: "last", path: "items" }, record)).toBe(
+        "c"
+      );
     });
 
     it("should join array elements", () => {
@@ -272,8 +272,8 @@ describe("ExpressionEvaluator", () => {
       expect(
         evaluator.evaluate(
           { type: "array", operation: "join", path: "items", separator: "-" },
-          record,
-        ),
+          record
+        )
       ).toBe("a-b-c");
     });
 
@@ -282,14 +282,14 @@ describe("ExpressionEvaluator", () => {
       expect(
         evaluator.evaluate(
           { type: "array", operation: "includes", path: "items", value: 2 },
-          record,
-        ),
+          record
+        )
       ).toBe(true);
       expect(
         evaluator.evaluate(
           { type: "array", operation: "includes", path: "items", value: 5 },
-          record,
-        ),
+          record
+        )
       ).toBe(false);
     });
   });
@@ -297,23 +297,23 @@ describe("ExpressionEvaluator", () => {
   describe("string expression", () => {
     it("should convert to uppercase", () => {
       const record = { name: "John Doe" };
-      expect(
-        evaluator.evaluate({ type: "string", operation: "upper", path: "name" }, record),
-      ).toBe("JOHN DOE");
+      expect(evaluator.evaluate({ type: "string", operation: "upper", path: "name" }, record)).toBe(
+        "JOHN DOE"
+      );
     });
 
     it("should convert to lowercase", () => {
       const record = { name: "John Doe" };
-      expect(
-        evaluator.evaluate({ type: "string", operation: "lower", path: "name" }, record),
-      ).toBe("john doe");
+      expect(evaluator.evaluate({ type: "string", operation: "lower", path: "name" }, record)).toBe(
+        "john doe"
+      );
     });
 
     it("should trim whitespace", () => {
       const record = { name: "  John  " };
-      expect(
-        evaluator.evaluate({ type: "string", operation: "trim", path: "name" }, record),
-      ).toBe("John");
+      expect(evaluator.evaluate({ type: "string", operation: "trim", path: "name" }, record)).toBe(
+        "John"
+      );
     });
 
     it("should split string", () => {
@@ -321,8 +321,8 @@ describe("ExpressionEvaluator", () => {
       expect(
         evaluator.evaluate(
           { type: "string", operation: "split", path: "csv", separator: "," },
-          record,
-        ),
+          record
+        )
       ).toEqual(["a", "b", "c"]);
     });
 
@@ -331,8 +331,8 @@ describe("ExpressionEvaluator", () => {
       expect(
         evaluator.evaluate(
           { type: "string", operation: "substring", path: "text", start: 0, end: 5 },
-          record,
-        ),
+          record
+        )
       ).toBe("Hello");
     });
 
@@ -340,16 +340,22 @@ describe("ExpressionEvaluator", () => {
       const record = { text: "foo bar foo" };
       expect(
         evaluator.evaluate(
-          { type: "string", operation: "replace", path: "text", pattern: "foo", replacement: "baz" },
-          record,
-        ),
+          {
+            type: "string",
+            operation: "replace",
+            path: "text",
+            pattern: "foo",
+            replacement: "baz",
+          },
+          record
+        )
       ).toBe("baz bar baz");
     });
 
     it("should get string length", () => {
       const record = { name: "Hello" };
       expect(
-        evaluator.evaluate({ type: "string", operation: "length", path: "name" }, record),
+        evaluator.evaluate({ type: "string", operation: "length", path: "name" }, record)
       ).toBe(5);
     });
   });
@@ -365,7 +371,7 @@ describe("ExpressionEvaluator", () => {
       const record = { date: "2024-01-15T10:30:00Z" };
       const result = evaluator.evaluate(
         { type: "date", operation: "format", field: "date", format: "YYYY-MM-DD" },
-        record,
+        record
       );
       expect(result).toBe("2024-01-15");
     });
@@ -374,7 +380,7 @@ describe("ExpressionEvaluator", () => {
       const record = { date: "2024-01-15T00:00:00Z" };
       const result = evaluator.evaluate(
         { type: "date", operation: "add", field: "date", amount: 5, unit: "day" },
-        record,
+        record
       );
       expect(result).toContain("2024-01-20");
     });

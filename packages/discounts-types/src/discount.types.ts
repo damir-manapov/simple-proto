@@ -167,4 +167,3 @@ export interface CodeValidationInput {
     items?: { productId: string; categoryId?: string; quantity: number }[];
   };
 }
-

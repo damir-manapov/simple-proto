@@ -35,7 +35,7 @@ export class TransformNestService {
 
   updatePipeline(
     id: string,
-    updates: Partial<Pick<PipelineInput, "name" | "description" | "steps" | "status" | "schedule">>,
+    updates: Partial<Pick<PipelineInput, "name" | "description" | "steps" | "status" | "schedule">>
   ): TransformPipeline | null {
     return this.transformService.updatePipeline(id, updates);
   }
@@ -62,7 +62,7 @@ export class TransformNestService {
 
   previewStep(
     step: TransformStepInput,
-    limit?: number,
+    limit?: number
   ): { data: Record<string, unknown>[]; count: number } {
     return this.transformService.previewStep(step, limit);
   }

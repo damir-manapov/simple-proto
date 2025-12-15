@@ -167,7 +167,8 @@ export class DiscountService {
     if (input.description) entryInput.description = input.description;
     if (input.code) entryInput.code = input.code;
     if (input.usageLimit !== undefined) entryInput.usageLimit = input.usageLimit;
-    if (input.usageLimitPerCustomer !== undefined) entryInput.usageLimitPerCustomer = input.usageLimitPerCustomer;
+    if (input.usageLimitPerCustomer !== undefined)
+      entryInput.usageLimitPerCustomer = input.usageLimitPerCustomer;
     if (input.validFrom) entryInput.validFrom = input.validFrom.toISOString();
     if (input.validUntil) entryInput.validUntil = input.validUntil.toISOString();
 
@@ -212,7 +213,7 @@ export class DiscountService {
     if (!existing) return null;
 
     const now = new Date().toISOString();
-    
+
     // Build merged entry
     const merged: DiscountEntry = {
       ...existing,
@@ -228,7 +229,8 @@ export class DiscountService {
     if (input.priority !== undefined) merged.priority = input.priority;
     if (input.stacking !== undefined) merged.stacking = input.stacking;
     if (input.usageLimit !== undefined) merged.usageLimit = input.usageLimit;
-    if (input.usageLimitPerCustomer !== undefined) merged.usageLimitPerCustomer = input.usageLimitPerCustomer;
+    if (input.usageLimitPerCustomer !== undefined)
+      merged.usageLimitPerCustomer = input.usageLimitPerCustomer;
     if (input.validFrom !== undefined) merged.validFrom = input.validFrom.toISOString();
     if (input.validUntil !== undefined) merged.validUntil = input.validUntil.toISOString();
     if (input.status !== undefined) merged.status = input.status;
@@ -613,7 +615,9 @@ export class DiscountService {
       ...(entry.description !== undefined && { description: entry.description }),
       ...(entry.code !== undefined && { code: entry.code }),
       ...(entry.usageLimit !== undefined && { usageLimit: entry.usageLimit }),
-      ...(entry.usageLimitPerCustomer !== undefined && { usageLimitPerCustomer: entry.usageLimitPerCustomer }),
+      ...(entry.usageLimitPerCustomer !== undefined && {
+        usageLimitPerCustomer: entry.usageLimitPerCustomer,
+      }),
       ...(entry.validFrom !== undefined && { validFrom: new Date(entry.validFrom) }),
       ...(entry.validUntil !== undefined && { validUntil: new Date(entry.validUntil) }),
     };

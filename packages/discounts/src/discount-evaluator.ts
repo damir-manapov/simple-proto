@@ -58,7 +58,11 @@ export class DiscountEvaluator {
     const allApplicable = [...applicableAuto, ...applicableCode];
 
     // Apply stacking strategy
-    const appliedDiscounts = this.applyStackingStrategy(allApplicable, context, opts.stackingStrategy);
+    const appliedDiscounts = this.applyStackingStrategy(
+      allApplicable,
+      context,
+      opts.stackingStrategy
+    );
 
     // Calculate totals
     let totalDiscount = 0;
@@ -75,7 +79,10 @@ export class DiscountEvaluator {
     // Cap discount at subtotal
     totalDiscount = Math.min(totalDiscount, subtotal);
 
-    const finalTotal = Math.max(0, subtotal - totalDiscount + (context.shippingAmount ?? 0) - shippingDiscount);
+    const finalTotal = Math.max(
+      0,
+      subtotal - totalDiscount + (context.shippingAmount ?? 0) - shippingDiscount
+    );
 
     return {
       appliedDiscounts,

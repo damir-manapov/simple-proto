@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import type { Discount, CartContext, DiscountTarget, DiscountValue } from "@simple-proto/discounts-types";
+import type {
+  Discount,
+  CartContext,
+  DiscountTarget,
+  DiscountValue,
+} from "@simple-proto/discounts-types";
 import { DiscountCalculator } from "../src/discount-calculator.js";
 
 describe("DiscountCalculator", () => {
@@ -34,10 +39,7 @@ describe("DiscountCalculator", () => {
 
   describe("percentage discount", () => {
     it("should calculate percentage off cart", () => {
-      const discount = createDiscount(
-        { type: "cart" },
-        { type: "percentage", percentage: 10 }
-      );
+      const discount = createDiscount({ type: "cart" }, { type: "percentage", percentage: 10 });
 
       const result = calculator.calculate(discount, baseContext);
 
@@ -85,10 +87,7 @@ describe("DiscountCalculator", () => {
 
   describe("fixed amount discount", () => {
     it("should apply fixed amount to cart", () => {
-      const discount = createDiscount(
-        { type: "cart" },
-        { type: "fixedAmount", amount: 30 }
-      );
+      const discount = createDiscount({ type: "cart" }, { type: "fixedAmount", amount: 30 });
 
       const result = calculator.calculate(discount, baseContext);
 
@@ -108,10 +107,7 @@ describe("DiscountCalculator", () => {
     });
 
     it("should distribute proportionally among items", () => {
-      const discount = createDiscount(
-        { type: "cart" },
-        { type: "fixedAmount", amount: 40 }
-      );
+      const discount = createDiscount({ type: "cart" }, { type: "fixedAmount", amount: 40 });
 
       const result = calculator.calculate(discount, baseContext);
 

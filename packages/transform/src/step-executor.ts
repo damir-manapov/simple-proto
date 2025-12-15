@@ -67,9 +67,11 @@ export class StepExecutor {
     }
   }
 
-  private executeStep(
-    step: TransformStep,
-  ): { inputRows: number; outputRows: number; outputCollection: string } {
+  private executeStep(step: TransformStep): {
+    inputRows: number;
+    outputRows: number;
+    outputCollection: string;
+  } {
     switch (step.type) {
       case "filter":
         return this.executeFilter(step.config as FilterStepConfig);
@@ -122,14 +124,16 @@ export class StepExecutor {
   }
 
   // ==================== Filter ====================
-  private executeFilter(
-    config: FilterStepConfig,
-  ): { inputRows: number; outputRows: number; outputCollection: string } {
+  private executeFilter(config: FilterStepConfig): {
+    inputRows: number;
+    outputRows: number;
+    outputCollection: string;
+  } {
     const records = this.getRecords(config.source);
     const inputRows = records.length;
 
     const filtered = records.filter((record) =>
-      this.matchesConditions(record, config.conditions, config.conditionLogic),
+      this.matchesConditions(record, config.conditions, config.conditionLogic)
     );
 
     this.clearAndCreate(config.output);
@@ -143,7 +147,7 @@ export class StepExecutor {
   private matchesConditions(
     record: DataRecord,
     conditions: FilterCondition[],
-    logic: "and" | "or" = "and",
+    logic: "and" | "or" = "and"
   ): boolean {
     if (conditions.length === 0) return true;
 
@@ -222,16 +226,16 @@ export class StepExecutor {
   }
 
   // ==================== Map ====================
-  private executeMap(
-    config: MapStepConfig,
-  ): { inputRows: number; outputRows: number; outputCollection: string } {
+  private executeMap(config: MapStepConfig): {
+    inputRows: number;
+    outputRows: number;
+    outputCollection: string;
+  } {
     const records = this.getRecords(config.source);
     const inputRows = records.length;
 
     const mapped = records.map((record) => {
-      const result: DataRecordInput = config.includeOriginal
-        ? { ...record }
-        : { id: record.id };
+      const result: DataRecordInput = config.includeOriginal ? { ...record } : { id: record.id };
 
       for (const mapping of config.mappings) {
         result[mapping.target] = this.expressionEvaluator.evaluate(mapping.expression, record);
@@ -249,9 +253,11 @@ export class StepExecutor {
   }
 
   // ==================== Aggregate ====================
-  private executeAggregate(
-    config: AggregateStepConfig,
-  ): { inputRows: number; outputRows: number; outputCollection: string } {
+  private executeAggregate(config: AggregateStepConfig): {
+    inputRows: number;
+    outputRows: number;
+    outputCollection: string;
+  } {
     const records = this.getRecords(config.source);
     const inputRows = records.length;
 
@@ -263,7 +269,9 @@ export class StepExecutor {
         config.groupBy.length === 0
           ? "__all__"
           : config.groupBy
-              .map((field) => JSON.stringify(this.expressionEvaluator.getNestedValue(record, field)))
+              .map((field) =>
+                JSON.stringify(this.expressionEvaluator.getNestedValue(record, field))
+              )
               .join("|");
 
       if (!groups.has(key)) {
@@ -296,7 +304,7 @@ export class StepExecutor {
       // Apply having conditions
       if (config.having && config.having.length > 0) {
         const matchesHaving = config.having.every((cond) =>
-          this.expressionEvaluator.evaluateCondition(cond, result as DataRecord),
+          this.expressionEvaluator.evaluateCondition(cond, result as DataRecord)
         );
         if (!matchesHaving) continue;
       }
@@ -315,7 +323,7 @@ export class StepExecutor {
   private computeAggregation(
     records: DataRecord[],
     field: string,
-    func: AggregateFunction,
+    func: AggregateFunction
   ): unknown {
     if (func === "count") {
       return records.length;
@@ -360,9 +368,11 @@ export class StepExecutor {
   }
 
   // ==================== Join ====================
-  private executeJoin(
-    config: JoinStepConfig,
-  ): { inputRows: number; outputRows: number; outputCollection: string } {
+  private executeJoin(config: JoinStepConfig): {
+    inputRows: number;
+    outputRows: number;
+    outputCollection: string;
+  } {
     const leftRecords = this.getRecords(config.left);
     const rightRecords = this.getRecords(config.right);
     const inputRows = leftRecords.length + rightRecords.length;
@@ -372,7 +382,7 @@ export class StepExecutor {
     for (const record of rightRecords) {
       const key = config.on
         .map((cond) =>
-          JSON.stringify(this.expressionEvaluator.getNestedValue(record, cond.rightField)),
+          JSON.stringify(this.expressionEvaluator.getNestedValue(record, cond.rightField))
         )
         .join("|");
       if (!rightIndex.has(key)) {
@@ -387,7 +397,7 @@ export class StepExecutor {
     for (const leftRecord of leftRecords) {
       const key = config.on
         .map((cond) =>
-          JSON.stringify(this.expressionEvaluator.getNestedValue(leftRecord, cond.leftField)),
+          JSON.stringify(this.expressionEvaluator.getNestedValue(leftRecord, cond.leftField))
         )
         .join("|");
 
@@ -423,7 +433,7 @@ export class StepExecutor {
   private mergeRecords(
     left: DataRecord | null,
     right: DataRecord | null,
-    config: JoinStepConfig,
+    config: JoinStepConfig
   ): DataRecordInput {
     const result: DataRecordInput = {};
     const leftPrefix = config.prefix?.left ?? "";
@@ -467,9 +477,11 @@ export class StepExecutor {
   }
 
   // ==================== Lookup ====================
-  private executeLookup(
-    config: LookupStepConfig,
-  ): { inputRows: number; outputRows: number; outputCollection: string } {
+  private executeLookup(config: LookupStepConfig): {
+    inputRows: number;
+    outputRows: number;
+    outputCollection: string;
+  } {
     const sourceRecords = this.getRecords(config.source);
     const lookupRecords = this.getRecords(config.from);
     const inputRows = sourceRecords.length;
@@ -504,9 +516,11 @@ export class StepExecutor {
   }
 
   // ==================== Union ====================
-  private executeUnion(
-    config: UnionStepConfig,
-  ): { inputRows: number; outputRows: number; outputCollection: string } {
+  private executeUnion(config: UnionStepConfig): {
+    inputRows: number;
+    outputRows: number;
+    outputCollection: string;
+  } {
     let allRecords: DataRecord[] = [];
     let inputRows = 0;
 
@@ -520,9 +534,7 @@ export class StepExecutor {
       const seen = new Set<string>();
       allRecords = allRecords.filter((record) => {
         const key = (config.distinctKeys ?? [])
-          .map((field) =>
-            JSON.stringify(this.expressionEvaluator.getNestedValue(record, field)),
-          )
+          .map((field) => JSON.stringify(this.expressionEvaluator.getNestedValue(record, field)))
           .join("|");
         if (seen.has(key)) return false;
         seen.add(key);
@@ -539,9 +551,11 @@ export class StepExecutor {
   }
 
   // ==================== Deduplicate ====================
-  private executeDeduplicate(
-    config: DeduplicateStepConfig,
-  ): { inputRows: number; outputRows: number; outputCollection: string } {
+  private executeDeduplicate(config: DeduplicateStepConfig): {
+    inputRows: number;
+    outputRows: number;
+    outputCollection: string;
+  } {
     let records = this.getRecords(config.source);
     const inputRows = records.length;
 
@@ -554,9 +568,7 @@ export class StepExecutor {
     const seen = new Map<string, DataRecord>();
     for (const record of records) {
       const key = config.keys
-        .map((field) =>
-          JSON.stringify(this.expressionEvaluator.getNestedValue(record, field)),
-        )
+        .map((field) => JSON.stringify(this.expressionEvaluator.getNestedValue(record, field)))
         .join("|");
 
       if (config.keep === "first" && !seen.has(key)) {
@@ -577,9 +589,11 @@ export class StepExecutor {
   }
 
   // ==================== Sort ====================
-  private executeSort(
-    config: SortStepConfig,
-  ): { inputRows: number; outputRows: number; outputCollection: string } {
+  private executeSort(config: SortStepConfig): {
+    inputRows: number;
+    outputRows: number;
+    outputCollection: string;
+  } {
     const records = this.getRecords(config.source);
     const inputRows = records.length;
 
@@ -595,7 +609,7 @@ export class StepExecutor {
 
   private sortRecords(
     records: DataRecord[],
-    orderBy: { field: string; direction: "asc" | "desc"; nulls?: "first" | "last" }[],
+    orderBy: { field: string; direction: "asc" | "desc"; nulls?: "first" | "last" }[]
   ): DataRecord[] {
     return [...records].sort((a, b) => {
       for (const sort of orderBy) {
@@ -629,9 +643,11 @@ export class StepExecutor {
   }
 
   // ==================== Limit ====================
-  private executeLimit(
-    config: LimitStepConfig,
-  ): { inputRows: number; outputRows: number; outputCollection: string } {
+  private executeLimit(config: LimitStepConfig): {
+    inputRows: number;
+    outputRows: number;
+    outputCollection: string;
+  } {
     const records = this.getRecords(config.source);
     const inputRows = records.length;
 
@@ -647,9 +663,11 @@ export class StepExecutor {
   }
 
   // ==================== Pivot ====================
-  private executePivot(
-    config: PivotStepConfig,
-  ): { inputRows: number; outputRows: number; outputCollection: string } {
+  private executePivot(config: PivotStepConfig): {
+    inputRows: number;
+    outputRows: number;
+    outputCollection: string;
+  } {
     const records = this.getRecords(config.source);
     const inputRows = records.length;
 
@@ -711,7 +729,7 @@ export class StepExecutor {
         result[pivotKey] = this.computeAggregation(
           values.map((v) => ({ id: "", value: v }) as DataRecord),
           "value",
-          config.aggregation,
+          config.aggregation
         );
       }
 
@@ -727,9 +745,11 @@ export class StepExecutor {
   }
 
   // ==================== Unpivot ====================
-  private executeUnpivot(
-    config: UnpivotStepConfig,
-  ): { inputRows: number; outputRows: number; outputCollection: string } {
+  private executeUnpivot(config: UnpivotStepConfig): {
+    inputRows: number;
+    outputRows: number;
+    outputCollection: string;
+  } {
     const records = this.getRecords(config.source);
     const inputRows = records.length;
 
@@ -760,9 +780,11 @@ export class StepExecutor {
   }
 
   // ==================== Flatten ====================
-  private executeFlatten(
-    config: FlattenStepConfig,
-  ): { inputRows: number; outputRows: number; outputCollection: string } {
+  private executeFlatten(config: FlattenStepConfig): {
+    inputRows: number;
+    outputRows: number;
+    outputCollection: string;
+  } {
     const records = this.getRecords(config.source);
     const inputRows = records.length;
 

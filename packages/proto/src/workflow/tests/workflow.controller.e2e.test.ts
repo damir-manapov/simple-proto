@@ -58,14 +58,18 @@ describe("Workflow Controllers (e2e)", () => {
 
     describe("GET /workflows", () => {
       it("should get all workflows", async () => {
-        await request(getServer()).post("/workflows").send({
-          name: "Workflow 1",
-          steps: [{ id: "end", type: "end" }],
-        });
-        await request(getServer()).post("/workflows").send({
-          name: "Workflow 2",
-          steps: [{ id: "end", type: "end" }],
-        });
+        await request(getServer())
+          .post("/workflows")
+          .send({
+            name: "Workflow 1",
+            steps: [{ id: "end", type: "end" }],
+          });
+        await request(getServer())
+          .post("/workflows")
+          .send({
+            name: "Workflow 2",
+            steps: [{ id: "end", type: "end" }],
+          });
 
         const response = await request(getServer()).get("/workflows").expect(200);
 
@@ -76,10 +80,12 @@ describe("Workflow Controllers (e2e)", () => {
 
     describe("GET /workflows/:id", () => {
       it("should get a workflow by id", async () => {
-        const createResponse = await request(getServer()).post("/workflows").send({
-          name: "Test Workflow",
-          steps: [{ id: "end", type: "end" }],
-        });
+        const createResponse = await request(getServer())
+          .post("/workflows")
+          .send({
+            name: "Test Workflow",
+            steps: [{ id: "end", type: "end" }],
+          });
         const created = createResponse.body as Workflow;
 
         const response = await request(getServer()).get(`/workflows/${created.id}`).expect(200);
@@ -96,10 +102,12 @@ describe("Workflow Controllers (e2e)", () => {
 
     describe("PUT /workflows/:id", () => {
       it("should update a workflow", async () => {
-        const createResponse = await request(getServer()).post("/workflows").send({
-          name: "Original",
-          steps: [{ id: "end", type: "end" }],
-        });
+        const createResponse = await request(getServer())
+          .post("/workflows")
+          .send({
+            name: "Original",
+            steps: [{ id: "end", type: "end" }],
+          });
         const created = createResponse.body as Workflow;
 
         const response = await request(getServer())
@@ -115,10 +123,12 @@ describe("Workflow Controllers (e2e)", () => {
 
     describe("DELETE /workflows/:id", () => {
       it("should delete a workflow", async () => {
-        const createResponse = await request(getServer()).post("/workflows").send({
-          name: "ToDelete",
-          steps: [{ id: "end", type: "end" }],
-        });
+        const createResponse = await request(getServer())
+          .post("/workflows")
+          .send({
+            name: "ToDelete",
+            steps: [{ id: "end", type: "end" }],
+          });
         const created = createResponse.body as Workflow;
 
         await request(getServer()).delete(`/workflows/${created.id}`).expect(200);
@@ -131,11 +141,13 @@ describe("Workflow Controllers (e2e)", () => {
     describe("POST /workflow-executions", () => {
       it("should start an execution", async () => {
         // First create an active workflow
-        const createResponse = await request(getServer()).post("/workflows").send({
-          name: "Executable",
-          status: "active",
-          steps: [{ id: "end", type: "end" }],
-        });
+        const createResponse = await request(getServer())
+          .post("/workflows")
+          .send({
+            name: "Executable",
+            status: "active",
+            steps: [{ id: "end", type: "end" }],
+          });
         const workflow = createResponse.body as Workflow;
 
         const response = await request(getServer())
@@ -166,11 +178,13 @@ describe("Workflow Controllers (e2e)", () => {
 
     describe("GET /workflow-executions", () => {
       it("should list executions", async () => {
-        const createResponse = await request(getServer()).post("/workflows").send({
-          name: "Executable",
-          status: "active",
-          steps: [{ id: "end", type: "end" }],
-        });
+        const createResponse = await request(getServer())
+          .post("/workflows")
+          .send({
+            name: "Executable",
+            status: "active",
+            steps: [{ id: "end", type: "end" }],
+          });
         const workflow = createResponse.body as Workflow;
 
         await request(getServer())
@@ -191,11 +205,13 @@ describe("Workflow Controllers (e2e)", () => {
 
     describe("GET /workflow-executions/:id", () => {
       it("should get an execution by id", async () => {
-        const createResponse = await request(getServer()).post("/workflows").send({
-          name: "Executable",
-          status: "active",
-          steps: [{ id: "end", type: "end" }],
-        });
+        const createResponse = await request(getServer())
+          .post("/workflows")
+          .send({
+            name: "Executable",
+            status: "active",
+            steps: [{ id: "end", type: "end" }],
+          });
         const workflow = createResponse.body as Workflow;
 
         const startResponse = await request(getServer())
@@ -218,14 +234,16 @@ describe("Workflow Controllers (e2e)", () => {
 
     describe("POST /workflow-executions/:id/resume", () => {
       it("should resume a paused execution", async () => {
-        const createResponse = await request(getServer()).post("/workflows").send({
-          name: "Pausable",
-          status: "active",
-          steps: [
-            { id: "wait", type: "pause", reason: "Waiting", next: "end" },
-            { id: "end", type: "end" },
-          ],
-        });
+        const createResponse = await request(getServer())
+          .post("/workflows")
+          .send({
+            name: "Pausable",
+            status: "active",
+            steps: [
+              { id: "wait", type: "pause", reason: "Waiting", next: "end" },
+              { id: "end", type: "end" },
+            ],
+          });
         const workflow = createResponse.body as Workflow;
 
         const startResponse = await request(getServer())
@@ -247,14 +265,16 @@ describe("Workflow Controllers (e2e)", () => {
 
     describe("POST /workflow-executions/:id/cancel", () => {
       it("should cancel an execution", async () => {
-        const createResponse = await request(getServer()).post("/workflows").send({
-          name: "Pausable",
-          status: "active",
-          steps: [
-            { id: "wait", type: "pause", reason: "Waiting", next: "end" },
-            { id: "end", type: "end" },
-          ],
-        });
+        const createResponse = await request(getServer())
+          .post("/workflows")
+          .send({
+            name: "Pausable",
+            status: "active",
+            steps: [
+              { id: "wait", type: "pause", reason: "Waiting", next: "end" },
+              { id: "end", type: "end" },
+            ],
+          });
         const workflow = createResponse.body as Workflow;
 
         const startResponse = await request(getServer())

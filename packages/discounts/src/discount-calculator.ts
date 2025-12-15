@@ -26,7 +26,11 @@ export class DiscountCalculator {
   calculate(discount: Discount, context: CartContext): AppliedDiscount | null {
     const eligibleItems = this.getEligibleItems(discount, context);
 
-    if (eligibleItems.length === 0 && discount.target.type !== "cart" && discount.target.type !== "shipping") {
+    if (
+      eligibleItems.length === 0 &&
+      discount.target.type !== "cart" &&
+      discount.target.type !== "shipping"
+    ) {
       return null;
     }
 
@@ -55,13 +59,17 @@ export class DiscountCalculator {
         return [...context.items];
       case "product":
         return context.items.filter((item) =>
-          (discount.target as { type: "product"; productIds: string[] }).productIds.includes(item.productId)
+          (discount.target as { type: "product"; productIds: string[] }).productIds.includes(
+            item.productId
+          )
         );
       case "category":
         return context.items.filter(
           (item) =>
             item.categoryId &&
-            (discount.target as { type: "category"; categoryIds: string[] }).categoryIds.includes(item.categoryId)
+            (discount.target as { type: "category"; categoryIds: string[] }).categoryIds.includes(
+              item.categoryId
+            )
         );
       case "shipping":
         return []; // Shipping discounts don't apply to items

@@ -94,10 +94,14 @@ describe("CodeGenerator", () => {
 
     it("should not include existing codes", () => {
       const existingCodes = new Set(["AAAA1111", "BBBB2222"]);
-      const codes = generator.generateBatch(5, {
-        pattern: "alphanumeric",
-        length: 8,
-      }, existingCodes);
+      const codes = generator.generateBatch(
+        5,
+        {
+          pattern: "alphanumeric",
+          length: 8,
+        },
+        existingCodes
+      );
 
       expect(codes).toHaveLength(5);
       for (const code of codes) {

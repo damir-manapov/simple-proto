@@ -39,7 +39,7 @@ export class TransformService {
   }
 
   private getRepo<T extends Entry, TInput extends EntryInput>(
-    collection: string,
+    collection: string
   ): IRepository<T, TInput> {
     return this.storage.getRepository<T, TInput>(collection);
   }
@@ -73,7 +73,7 @@ export class TransformService {
 
   updatePipeline(
     id: string,
-    updates: Partial<Pick<PipelineInput, "name" | "description" | "steps" | "status" | "schedule">>,
+    updates: Partial<Pick<PipelineInput, "name" | "description" | "steps" | "status" | "schedule">>
   ): TransformPipeline | null {
     const pipeline = this.getPipeline(id);
     if (!pipeline) return null;
@@ -150,7 +150,7 @@ export class TransformService {
       // Check dependencies
       if (step.dependsOn && step.dependsOn.length > 0) {
         const allDependenciesMet = step.dependsOn.every((depId) =>
-          stepResults.some((r) => r.stepId === depId && r.status === "completed"),
+          stepResults.some((r) => r.stepId === depId && r.status === "completed")
         );
         if (!allDependenciesMet) {
           stepResults.push({
@@ -209,9 +209,7 @@ export class TransformService {
   listPipelineRuns(pipelineId: string): PipelineRun[] {
     const repo = this.getRepo<DataRecord, DataRecordInput>("transform_runs");
     const all = repo.findAll();
-    return all
-      .filter((e) => e["pipelineId"] === pipelineId)
-      .map((e) => this.toRun(e));
+    return all.filter((e) => e["pipelineId"] === pipelineId).map((e) => this.toRun(e));
   }
 
   cancelRun(_runId: string): boolean {
@@ -224,7 +222,7 @@ export class TransformService {
 
   previewStep(
     step: TransformStepInput,
-    limit?: number,
+    limit?: number
   ): { data: Record<string, unknown>[]; count: number } {
     // Create a preview output collection
     const previewOutput = `_preview_${this.generateId()}`;
@@ -358,9 +356,7 @@ export class TransformService {
   }
 
   private toRun(entry: DataRecord): PipelineRun {
-    const completedAt = entry["completedAt"]
-      ? new Date(entry["completedAt"] as string)
-      : undefined;
+    const completedAt = entry["completedAt"] ? new Date(entry["completedAt"] as string) : undefined;
     const error = entry["error"] as string | undefined;
     return {
       id: entry.id,

@@ -49,7 +49,8 @@ export class TransformController {
   @Put(":id")
   update(
     @Param("id") id: string,
-    @Body() input: Partial<Pick<PipelineInput, "name" | "description" | "steps" | "status" | "schedule">>,
+    @Body()
+    input: Partial<Pick<PipelineInput, "name" | "description" | "steps" | "status" | "schedule">>
   ): TransformPipeline {
     const updated = this.service.updatePipeline(id, input);
     if (!updated) {
@@ -95,7 +96,7 @@ export class TransformController {
   @Post("preview")
   previewStep(
     @Body() step: TransformStepInput,
-    @Query("limit") limit?: string,
+    @Query("limit") limit?: string
   ): { data: Record<string, unknown>[]; count: number } {
     const limitNum = limit ? parseInt(limit, 10) : undefined;
     return this.service.previewStep(step, limitNum);

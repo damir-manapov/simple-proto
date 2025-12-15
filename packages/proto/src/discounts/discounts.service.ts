@@ -54,7 +54,7 @@ export class DiscountsService {
 
   calculateDiscounts(
     context: CartContext,
-    options?: { stackingStrategy?: StackingStrategy; maxDiscounts?: number },
+    options?: { stackingStrategy?: StackingStrategy; maxDiscounts?: number }
   ): DiscountResult {
     if (!options) {
       return this.discountService.calculateDiscounts(context);
@@ -84,7 +84,11 @@ export class DiscountsService {
     return this.discountService.generateCode(discountId, options);
   }
 
-  generateCodeBatch(discountId: string, count: number, options: CodeGenerationOptions): GeneratedCode[] {
+  generateCodeBatch(
+    discountId: string,
+    count: number,
+    options: CodeGenerationOptions
+  ): GeneratedCode[] {
     return this.discountService.generateCodeBatch(discountId, count, options);
   }
 

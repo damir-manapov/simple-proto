@@ -86,7 +86,7 @@ export class DiscountsController {
       context: CartContext;
       stackingStrategy?: StackingStrategy;
       maxDiscounts?: number;
-    },
+    }
   ): DiscountResult {
     const options: { stackingStrategy?: StackingStrategy; maxDiscounts?: number } = {};
     if (body.stackingStrategy !== undefined) {
@@ -118,7 +118,7 @@ export class UsageController {
   @Get("count")
   getCount(
     @Query("discountId") discountId: string,
-    @Query("customerId") customerId: string,
+    @Query("customerId") customerId: string
   ): { count: number } {
     if (!discountId || !customerId) {
       throw new HttpException("discountId and customerId are required", HttpStatus.BAD_REQUEST);
@@ -137,19 +137,23 @@ export class GeneratedCodesController {
   @Post()
   generate(
     @Body()
-    body: { discountId: string; count: number; options?: CodeGenerationOptions },
+    body: {
+      discountId: string;
+      count: number;
+      options?: CodeGenerationOptions;
+    }
   ): { codes: GeneratedCode[] } {
     try {
       const codes = this.service.generateCodeBatch(
         body.discountId,
         body.count,
-        body.options ?? { pattern: "alphanumeric", length: 8 },
+        body.options ?? { pattern: "alphanumeric", length: 8 }
       );
       return { codes };
     } catch (error) {
       throw new HttpException(
         error instanceof Error ? error.message : "Failed to generate codes",
-        HttpStatus.BAD_REQUEST,
+        HttpStatus.BAD_REQUEST
       );
     }
   }
@@ -182,7 +186,7 @@ export class GeneratedCodesController {
   @HttpCode(200)
   redeem(
     @Param("code") code: string,
-    @Body() body: { customerId: string; orderId?: string },
+    @Body() body: { customerId: string; orderId?: string }
   ): { success: boolean; code: GeneratedCode } {
     const generated = this.service.getGeneratedCode(code);
     if (!generated) {
@@ -192,7 +196,7 @@ export class GeneratedCodesController {
       const redeemed = this.service.redeemCode(
         code,
         body.customerId,
-        body.orderId ?? `order-${String(Date.now())}`,
+        body.orderId ?? `order-${String(Date.now())}`
       );
       if (!redeemed) {
         throw new HttpException("Code not found", HttpStatus.NOT_FOUND);
@@ -201,7 +205,7 @@ export class GeneratedCodesController {
     } catch (error) {
       throw new HttpException(
         error instanceof Error ? error.message : "Failed to redeem code",
-        HttpStatus.BAD_REQUEST,
+        HttpStatus.BAD_REQUEST
       );
     }
   }

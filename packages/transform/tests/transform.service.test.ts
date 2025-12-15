@@ -226,7 +226,7 @@ describe("TransformService", () => {
 
       expect(result.valid).toBe(false);
       expect(result.errors).toContainEqual(
-        expect.objectContaining({ code: "REQUIRED_FIELD", field: "name" }),
+        expect.objectContaining({ code: "REQUIRED_FIELD", field: "name" })
       );
     });
 
@@ -238,7 +238,7 @@ describe("TransformService", () => {
 
       expect(result.valid).toBe(false);
       expect(result.errors).toContainEqual(
-        expect.objectContaining({ code: "REQUIRED_FIELD", field: "steps" }),
+        expect.objectContaining({ code: "REQUIRED_FIELD", field: "steps" })
       );
     });
 
@@ -258,7 +258,7 @@ describe("TransformService", () => {
 
       expect(result.valid).toBe(false);
       expect(result.errors).toContainEqual(
-        expect.objectContaining({ code: "REQUIRED_FIELD", field: "config.output" }),
+        expect.objectContaining({ code: "REQUIRED_FIELD", field: "config.output" })
       );
     });
 
@@ -278,7 +278,7 @@ describe("TransformService", () => {
 
       expect(result.valid).toBe(false);
       expect(result.errors).toContainEqual(
-        expect.objectContaining({ code: "REQUIRED_FIELD", field: "config.source" }),
+        expect.objectContaining({ code: "REQUIRED_FIELD", field: "config.source" })
       );
     });
 

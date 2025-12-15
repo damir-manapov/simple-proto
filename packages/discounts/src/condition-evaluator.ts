@@ -107,7 +107,10 @@ export class ConditionEvaluator {
     return condition.tags.some((tag) => context.customer?.tags?.includes(tag));
   }
 
-  private evaluateRequiredProducts(condition: RequiredProductsCondition, context: CartContext): boolean {
+  private evaluateRequiredProducts(
+    condition: RequiredProductsCondition,
+    context: CartContext
+  ): boolean {
     for (const requiredId of condition.productIds) {
       const item = context.items.find((i) => i.productId === requiredId);
       if (!item) return false;

@@ -92,9 +92,7 @@ describe("TransformController (e2e)", () => {
     });
 
     it("should return 404 for non-existent pipeline", async () => {
-      await request(getServer())
-        .get("/transform/pipelines/non-existent")
-        .expect(404);
+      await request(getServer()).get("/transform/pipelines/non-existent").expect(404);
     });
 
     it("should list pipelines", async () => {
@@ -107,9 +105,7 @@ describe("TransformController (e2e)", () => {
         })
         .expect(201);
 
-      const response = await request(getServer())
-        .get("/transform/pipelines")
-        .expect(200);
+      const response = await request(getServer()).get("/transform/pipelines").expect(200);
 
       const body = response.body as TransformPipeline[];
       expect(Array.isArray(body)).toBe(true);
@@ -157,9 +153,7 @@ describe("TransformController (e2e)", () => {
       expect(body.success).toBe(true);
 
       // Verify deletion
-      await request(getServer())
-        .get(`/transform/pipelines/${created.id}`)
-        .expect(404);
+      await request(getServer()).get(`/transform/pipelines/${created.id}`).expect(404);
     });
   });
 
@@ -324,9 +318,7 @@ describe("TransformController (e2e)", () => {
     });
 
     it("should return 404 for non-existent run", async () => {
-      await request(getServer())
-        .get("/transform/runs/non-existent")
-        .expect(404);
+      await request(getServer()).get("/transform/runs/non-existent").expect(404);
     });
   });
 });

@@ -41,7 +41,11 @@ describe("ConditionEvaluator", () => {
       const condition: DiscountCondition = { type: "minQuantity", quantity: 2, productIds: ["p1"] };
       expect(evaluator.evaluate(condition, baseContext)).toBe(true);
 
-      const condition2: DiscountCondition = { type: "minQuantity", quantity: 3, productIds: ["p1"] };
+      const condition2: DiscountCondition = {
+        type: "minQuantity",
+        quantity: 3,
+        productIds: ["p1"],
+      };
       expect(evaluator.evaluate(condition2, baseContext)).toBe(false);
     });
   });
@@ -163,10 +167,18 @@ describe("ConditionEvaluator", () => {
     });
 
     it("should check minimum quantity", () => {
-      const condition: DiscountCondition = { type: "requiredProducts", productIds: ["p1"], minQuantity: 3 };
+      const condition: DiscountCondition = {
+        type: "requiredProducts",
+        productIds: ["p1"],
+        minQuantity: 3,
+      };
       expect(evaluator.evaluate(condition, baseContext)).toBe(false);
 
-      const condition2: DiscountCondition = { type: "requiredProducts", productIds: ["p1"], minQuantity: 2 };
+      const condition2: DiscountCondition = {
+        type: "requiredProducts",
+        productIds: ["p1"],
+        minQuantity: 2,
+      };
       expect(evaluator.evaluate(condition2, baseContext)).toBe(true);
     });
   });
